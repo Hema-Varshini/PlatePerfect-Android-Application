@@ -1,5 +1,10 @@
 package edu.northeastern.numad24su_plateperfect;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.widget.ImageButton;
+
 import java.util.Map;
 
 public class Recipe {
@@ -8,6 +13,7 @@ public class Recipe {
     private String description;
     private Map<String, String> ingredients;
     private String instructions;
+    private boolean isLiked;
 
     // Default constructor required for calls to DataSnapshot.getValue(Recipe.class)
     public Recipe() {
@@ -19,6 +25,7 @@ public class Recipe {
         this.description = description;
         this.ingredients = ingredients;
         this.instructions = instructions;
+        this.isLiked = false; // Initial state
     }
 
     // Getters and setters
@@ -60,5 +67,48 @@ public class Recipe {
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    // Methods for the UI actions
+    public void likeRecipe(ImageButton likeButton) {
+        // Logic to handle like functionality
+        isLiked = !isLiked;
+        if (isLiked) {
+            likeButton.setColorFilter(Color.RED); // Change heart color to red
+        } else {
+            likeButton.setColorFilter(Color.GRAY); // Change heart color to gray
+        }
+    }
+
+    public void shareRecipe(Context context) {
+        // Logic to handle share functionality
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, name + "\n" + description + "\n" + "Watch the recipe video: " + getVideoUrl());
+        shareIntent.setType("text/plain");
+        context.startActivity(Intent.createChooser(shareIntent, "Share via"));
+    }
+
+    public String getVideoUrl() {
+        // Return the video URL for the recipe
+        return "https://www.youtube.com/watch?v=sample_video_url"; // Example URL
+    }
+
+    public String getImageUrl() {
+        // Return the image URL for the recipe
+        return "https://www.example.com/sample_image_url.jpg"; // Example URL
+    }
+
+    public String getDetails() {
+        // Return the details of the recipe
+        return "Pasta originated from Italy and is a staple food of Italian cuisine.";
     }
 }
