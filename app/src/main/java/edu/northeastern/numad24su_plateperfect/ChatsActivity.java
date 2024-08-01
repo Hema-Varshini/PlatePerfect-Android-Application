@@ -84,6 +84,9 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
 
     @Override
     public void onUserClicked(int pos, String string) {
-
+        // send the username of the user clicked
+        // send the current user logged in
+        // Based sender and receiver activity should fetch the message history between them
+        // recipe ID shared , should have intent which open the recipe id from it.
     }
 }
