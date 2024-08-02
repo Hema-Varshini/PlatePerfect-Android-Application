@@ -37,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         username = findViewById(R.id.editTextUsername);
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        //Intent intent = new Intent(FirebaseRTDBLoginActivity.this, FirebaseRTDBMessageHistoryRecyclerViewActivity.class);
-        //startActivity(intent);
+        Intent intent = new Intent(LoginActivity.this, BottomNavBarActivity.class);
+        startActivity(intent);
         btnLogin.setOnClickListener(v -> {
             Log.i(Tag, "Firebase Button Clicked !!");
             String currentUser = username.getText().toString().trim();
