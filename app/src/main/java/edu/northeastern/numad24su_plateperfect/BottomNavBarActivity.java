@@ -22,6 +22,7 @@ public class  BottomNavBarActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding =  ActivityBottomNavBarBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.bottomNavigationView.setSelectedItemId(R.id.homeMenu);
         replaceFragment(new HomeFragment());
 
         binding.bottomNavigationView.setOnItemSelectedListener(item ->{
