@@ -1,17 +1,18 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import com.squareup.picasso.Picasso;
+
 
 public class aChildAdapterClass extends RecyclerView.Adapter<aChildAdapterClass.ViewHolder> {
 
@@ -32,7 +33,10 @@ public class aChildAdapterClass extends RecyclerView.Adapter<aChildAdapterClass.
 
     @Override
     public void onBindViewHolder(@NonNull aChildAdapterClass.ViewHolder holder, int position) {
-        holder.ivChildImage.setImageResource(rvChildModelClassList.get(position).image);
+        rvChildModelClass model = rvChildModelClassList.get(position);
+        String url = model.getLink();
+        Picasso.get().load(url).into(holder.ivChildImage);
+        holder.ivChildTitle.setText(rvChildModelClassList.get(position).recipe);
         //holder.ivChildImage.setOnClickListener(); //ToDO direct to recipe page
 
     }
@@ -44,10 +48,12 @@ public class aChildAdapterClass extends RecyclerView.Adapter<aChildAdapterClass.
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivChildImage;
+        TextView ivChildTitle;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivChildImage=itemView.findViewById(R.id.iv_child_item);
+            ivChildTitle=itemView.findViewById(R.id.iv_recipe_Title);
         }
     }
 }
