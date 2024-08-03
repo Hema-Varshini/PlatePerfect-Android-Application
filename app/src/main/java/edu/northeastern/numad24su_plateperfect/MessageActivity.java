@@ -1,13 +1,19 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class MessageActivity extends AppCompatActivity {
+    // Declare the launcher at the top of your Activity/Fragment:
+
     private String currentUser;
     private String otherUser;
     private String chatroomId;

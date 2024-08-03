@@ -8,6 +8,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -32,7 +34,16 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
     private DatabaseReference userdatabaseReference;
     private ArrayList<User> usersList;
     private String currentUser;
-
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // FCM SDK (and your app) can post notifications.
+                    Toast.makeText(this, "Notification access granted !!",Toast.LENGTH_SHORT);
+                } else {
+                    // TODO: Inform user that that your app will not show notifications.
+                    Toast.makeText(this, "Denied !!",Toast.LENGTH_SHORT);
+                }
+            });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

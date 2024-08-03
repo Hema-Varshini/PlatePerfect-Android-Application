@@ -1,8 +1,5 @@
 package edu.northeastern.numad24su_plateperfect;
 
-import java.sql.Time;
-import java.sql.Timestamp;
-
 public class ChatMessage {
     private String message;
     private String sender;
