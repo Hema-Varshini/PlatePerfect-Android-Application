@@ -2,9 +2,13 @@ package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -18,7 +22,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.ArrayList;
 
@@ -88,5 +91,18 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         // send the current user logged in
         // Based sender and receiver activity should fetch the message history between them
         // recipe ID shared , should have intent which open the recipe id from it.
+        User user = usersList.get(pos);
+        //navigate to chat activity
+        Intent intent = new Intent(this, MessageActivity.class);
+        passUserModelAsIntent(intent,user);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.startActivity(intent);
+    }
+
+    private void passUserModelAsIntent(Intent intent, User user) {
+        intent.putExtra("sender",user.getUsername());
+//        intent.putExtra("phone",user.getPhone());
+//        intent.putExtra("userId",model.getUserId());
+//        intent.putExtra("fcmToken",model.getFcmToken());
     }
 }

@@ -4,62 +4,62 @@
     android:layout_height="match_parent"
     tools:context=".RecipeActivity">
 
-    <ImageView
-        android:id="@+id/recipe_image"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/sample_image" />
+<!--&lt;!&ndash;    <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/recipe_image"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="200dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:scaleType="centerCrop"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:src="@drawable/sample_image" />&ndash;&gt;-->
 
-    <ImageButton
-        android:id="@+id/like_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="8dp"
-        android:background="@null"
-        android:src="@drawable/ic_like" />
+<!--&lt;!&ndash;    <ImageButton&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/like_button"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_alignParentEnd="true"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_margin="8dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:background="@null"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:src="@drawable/ic_like" />&ndash;&gt;-->
 
-    <ImageButton
-        android:id="@+id/share_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/like_button"
-        android:layout_margin="8dp"
-        android:background="@null"
-        android:src="@drawable/ic_share" />
+<!--&lt;!&ndash;    <ImageButton&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/share_button"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_toStartOf="@id/like_button"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_margin="8dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:background="@null"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:src="@drawable/ic_share" />&ndash;&gt;-->
 
-    <ImageButton
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="8dp"
-        android:background="@null"
-        android:src="@drawable/ic_play" />
+<!--&lt;!&ndash;    <ImageButton&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/play_button"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_alignParentBottom="true"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_alignParentEnd="true"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_margin="8dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:background="@null"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:src="@drawable/ic_play" />&ndash;&gt;-->
 
-    <TextView
-        android:id="@+id/recipe_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/recipe_image"
-        android:layout_margin="8dp"
-        android:text="Pasta"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+<!--&lt;!&ndash;    <TextView&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/recipe_name"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_below="@id/recipe_image"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_margin="8dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:text="Pasta"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:textSize="24sp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:textStyle="bold" />&ndash;&gt;-->
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/recipe_name"
-        android:layout_marginTop="8dp" />
+<!--    <com.google.android.material.tabs.TabLayout-->
+<!--        android:id="@+id/tab_layout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/recipe_name"-->
+<!--        android:layout_marginTop="8dp" />-->
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tab_layout" />
+<!--    <androidx.viewpager.widget.ViewPager-->
+<!--        android:id="@+id/view_pager"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_below="@id/tab_layout" />-->
 
 </RelativeLayout>

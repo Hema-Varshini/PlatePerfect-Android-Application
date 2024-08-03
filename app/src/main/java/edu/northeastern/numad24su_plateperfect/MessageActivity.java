@@ -1,14 +1,37 @@
 package edu.northeastern.numad24su_plateperfect;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class MessageActivity extends AppCompatActivity {
+    private String currentUser;
+    private String otherUser;
+    private String chatroomId;
+    private RecyclerView recyclerView;
+    private MessageActivityAdapter messageActivityAdapter;
+    private ArrayList<ChatMessage> chatMessageList;
+    private TextView senderTextView;
+    private ImageButton backBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +43,90 @@ public class MessageActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        senderTextView =  findViewById(R.id.senderTV);
+
+
+        Intent intent = getIntent();
+        //currentUser = intent.getStringExtra("currentUser");
+        currentUser = "shank";
+
+        //get UserModel
+        otherUser = getUserModelFromIntent(intent);
+       // otherUser = "Shashank";
+        chatroomId = getChatroomId(currentUser, otherUser);
+        senderTextView.setText(otherUser);
+
+        backBtn = findViewById(R.id.back_btn);
+        backBtn.setOnClickListener((v)->{
+            getOnBackPressedDispatcher().onBackPressed();
+        });
+        getOrCreateChatroomModel();
+        setupChatRecyclerView();
+    }
+
+    private void setupChatRecyclerView() {
+        FirebaseDatabase.getInstance().getReference(chatroomId+"/chats");
+        //setup a recipe messages list shared by other users as a recycler view
+        //attached to recylerview adapter
+        chatMessageList =  new ArrayList<ChatMessage>();
+        messageActivityAdapter = new MessageActivityAdapter(this, chatMessageList, currentUser);
+        recyclerView = findViewById(R.id.messagesRecyclerView);
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setReverseLayout(true);
+        recyclerView.setLayoutManager(manager);
+        recyclerView.setAdapter(messageActivityAdapter);
+
+        // Listen for new chat messages
+        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference(chatroomId + "/chats");
+        chatRef.orderByChild("timestamp").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                chatMessageList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    ChatMessage message = dataSnapshot.getValue(ChatMessage.class);
+                    chatMessageList.add(message);
+                }
+                // Reverse the list to display messages in descending order
+                Collections.reverse(chatMessageList);
+                messageActivityAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle possible errors.
+            }
+        });
+    }
+
+    private void getOrCreateChatroomModel() {
+        DatabaseReference chatroomRef = FirebaseDatabase.getInstance().getReference("chatrooms/" + chatroomId);
+        chatroomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    // Create new chatroom
+                    ChatRoom chatRoom = new ChatRoom(currentUser, otherUser);
+                    chatroomRef.setValue(chatRoom);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Handle possible errors.
+            }
+        });
+    }
+
+    private String getChatroomId(String currentUser, String otherUser) {
+        if(currentUser.hashCode()<otherUser.hashCode()){
+            return currentUser+"_"+otherUser;
+        }else{
+            return otherUser+"_"+currentUser;
+        }
+    }
+
+    private String getUserModelFromIntent(Intent intent) {
+        return intent.getStringExtra("sender");
     }
 }
