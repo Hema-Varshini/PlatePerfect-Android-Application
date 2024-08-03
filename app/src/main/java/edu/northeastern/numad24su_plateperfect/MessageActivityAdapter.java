@@ -28,7 +28,7 @@ public class MessageActivityAdapter extends RecyclerView.Adapter<MessageActivity
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View view = layoutInflater.inflate(R.layout.activity_chat_row, parent, false);
+        View view = layoutInflater.inflate(R.layout.chatmsg_recycler_row, parent, false);
         return new MessageViewHolder(view);
     }
 
@@ -36,7 +36,6 @@ public class MessageActivityAdapter extends RecyclerView.Adapter<MessageActivity
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
          ChatMessage msg = messagedRecipes.get(position);
 
-         holder.leftChatRecipeName.setText(msg.getMessage());
         if(msg.getSender().equals(currentUser)){
             holder.leftChatLayout.setVisibility(View.GONE);
             holder.rightChatLayout.setVisibility(View.VISIBLE);

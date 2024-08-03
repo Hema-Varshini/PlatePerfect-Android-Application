@@ -7,14 +7,14 @@ public class ChatMessage {
     private String message;
     private String sender;
     private String receiver;
-    private Timestamp timestamp;
+    private long timestamp;
 
 
     public ChatMessage() {
         // Default constructor required for calls to DataSnapshot.getValue(ChatMessage.class)
     }
 
-    public ChatMessage(String message, String sender, String receiver, Timestamp timestamp) {
+    public ChatMessage(String message, String sender, String receiver, long timestamp) {
         this.message = message;
         this.sender = sender;
         this.receiver = receiver;
@@ -45,11 +45,7 @@ public class ChatMessage {
         this.receiver = receiver;
     }
 
-    public Timestamp getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }

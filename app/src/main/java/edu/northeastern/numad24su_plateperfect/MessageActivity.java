@@ -66,7 +66,6 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void setupChatRecyclerView() {
-        FirebaseDatabase.getInstance().getReference(chatroomId+"/chats");
         //setup a recipe messages list shared by other users as a recycler view
         //attached to recylerview adapter
         chatMessageList =  new ArrayList<ChatMessage>();
@@ -78,7 +77,7 @@ public class MessageActivity extends AppCompatActivity {
         recyclerView.setAdapter(messageActivityAdapter);
 
         // Listen for new chat messages
-        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference(chatroomId + "/chats");
+        DatabaseReference chatRef = FirebaseDatabase.getInstance().getReference("chatrooms/"+chatroomId + "/chats");
         chatRef.orderByChild("timestamp").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
