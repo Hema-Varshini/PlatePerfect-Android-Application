@@ -37,10 +37,8 @@ public class MessagingService extends FirebaseMessagingService {
                 .setContentTitle(message.getNotification().getTitle())
                 .setContentText(message.getNotification().getBody()).setAutoCancel(true).setContentIntent(pendingIntent);;
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
-            manager.createNotificationChannel(channel);
-        }
+        NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
+        manager.createNotificationChannel(channel);
         manager.notify(0, builder.build());
     }
 }

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Plate Perfect</string>
+    <string name="selectItem">Select Item</string>
 </resources>

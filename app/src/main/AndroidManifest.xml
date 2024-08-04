@@ -30,6 +30,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".RecipeActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddRecipeActivity"
             android:exported="false" />
         <activity
