@@ -19,6 +19,7 @@
 
 
         <ImageButton
+            android:id="@+id/back_btn"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:src="@drawable/baseline_arrow_back_24"
@@ -28,7 +29,7 @@
             app:layout_constraintStart_toStartOf="@id/childCL"
             app:layout_constraintEnd_toStartOf="@id/profile_pic_image_view"
             app:layout_constraintBottom_toBottomOf="@id/childCL"
-            android:id="@+id/back_btn"/>
+           />
 
         <ImageView
             android:layout_width="52dp"
@@ -39,12 +40,12 @@
             android:id="@+id/profile_pic_image_view"
             app:layout_constraintTop_toTopOf="@id/childCL"
             app:layout_constraintStart_toEndOf="@id/back_btn"
-            app:layout_constraintEnd_toStartOf="@id/chatsAppBar"
+            app:layout_constraintEnd_toStartOf="@id/senderTV"
             app:layout_constraintBottom_toBottomOf="@id/childCL"
             />
 
         <TextView
-            android:id="@+id/chatsAppBar"
+            android:id="@+id/senderTV"
             android:text="Username"
             android:textSize="28dp"
             android:layout_marginStart="10dp"
@@ -70,4 +71,7 @@
         android:padding="20dp"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" />
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
