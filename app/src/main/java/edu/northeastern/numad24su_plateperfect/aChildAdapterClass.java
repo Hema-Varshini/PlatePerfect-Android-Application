@@ -34,9 +34,9 @@ public class aChildAdapterClass extends RecyclerView.Adapter<aChildAdapterClass.
     @Override
     public void onBindViewHolder(@NonNull aChildAdapterClass.ViewHolder holder, int position) {
         rvChildModelClass model = rvChildModelClassList.get(position);
-        String url = model.getLink();
+        String url = model.getImage_Link();
         Picasso.get().load(url).into(holder.ivChildImage);
-        holder.ivChildTitle.setText(rvChildModelClassList.get(position).recipe);
+        holder.ivChildTitle.setText(rvChildModelClassList.get(position).getName());
         //holder.ivChildImage.setOnClickListener(); //ToDO direct to recipe page
 
     }
