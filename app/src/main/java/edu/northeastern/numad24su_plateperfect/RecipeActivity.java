@@ -27,62 +27,51 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-
 
 public class RecipeActivity extends AppCompatActivity {
 
+    private static final String TAG = "RecipeActivity";
     private Recipe recipe;
     private boolean isLiked = false;
     private List<String> userNames = new ArrayList<>();
     private String currentUser;
     private DatabaseReference mdatabase;
+    private ImageView recipeImage;
+    private TextView recipeName;
+    private String fetchedRecipeName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
-        //currentUser = getIntent().getStringExtra("currentUser");
+
+        // For demonstration purposes, hardcoding the currentUser
         currentUser = "Shashank";
 
         fetchUserNames();
-        // Initialize the recipe (this should be retrieved from your database or passed via intent)
-        Map<String, String> ingredients = new HashMap<>();
-        ingredients.put("Rice", "2 bowls");
-        ingredients.put("Onion", "2");
-        ingredients.put("Tomatoes", "2");
-        recipe = new Recipe("1", "Pasta", "Delicious homemade pasta", ingredients, "Step by step instructions");
 
         // Set up UI elements
-        ImageView recipeImage = findViewById(R.id.recipe_image);
+        recipeImage = findViewById(R.id.recipe_image);
         ImageButton likeButton = findViewById(R.id.like_button);
         ImageButton shareButton = findViewById(R.id.share_button);
         ImageButton playButton = findViewById(R.id.play_button);
-        TextView recipeName = findViewById(R.id.recipe_name);
+        recipeName = findViewById(R.id.recipe_name);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         ViewPager viewPager = findViewById(R.id.view_pager);
         ImageButton sendButton = findViewById(R.id.send_button);
 
-        //send to user
+        // Send to user
         sendButton.setOnClickListener(v -> {
             sendThisRecipe();
         });
-
-        // Load image
-        Picasso.get().load(recipe.getImageUrl()).into(recipeImage);
-
-        // Set recipe name
-        recipeName.setText(recipe.getName());
 
         // Set up like button click listener
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //recipe.likeRecipe(likeButton);
                 isLiked = !isLiked;
                 likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
             }
@@ -107,58 +96,81 @@ public class RecipeActivity extends AppCompatActivity {
         playButton.setOnClickListener(playVideoListener);
         recipeImage.setOnClickListener(playVideoListener);
 
-        // Set up TabLayout and ViewPager
-        tabLayout.addTab(tabLayout.newTab().setText("Details"));
-        tabLayout.addTab(tabLayout.newTab().setText("Ingredients"));
-        tabLayout.addTab(tabLayout.newTab().setText("Instructions"));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        // Initialize Firebase Database reference
+        mdatabase = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference();
 
-        final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
+        // Fetch data from Firebase
+        fetchRecipeData();
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-            }
-        });
-        mdatabase = FirebaseDatabase.getInstance().getReference();
         mdatabase.child("latest/" + currentUser).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                //new child added is new message received
-
+                // new child added is new message received
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Toast.makeText(RecipeActivity.this, "new Message Recived", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RecipeActivity.this, "New Message Received", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
             }
 
             @Override
             public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
+    }
 
+    private void fetchRecipeData() {
+        // Fetch the image link and recipe name from Firebase
+        mdatabase.child("recipes").child("1").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String imageLink = dataSnapshot.child("Image_link").getValue(String.class);
+                String name = dataSnapshot.child("Name").getValue(String.class);
+
+                if (imageLink != null && name != null) {
+                    // Update the UI with the fetched data
+                    Picasso.get().load(imageLink).into(recipeImage);
+                    recipeName.setText(name);
+                    fetchedRecipeName = name;
+
+                    // Set up TabLayout and ViewPager
+                    TabLayout tabLayout = findViewById(R.id.tab_layout);
+                    ViewPager viewPager = findViewById(R.id.view_pager);
+                    final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fetchedRecipeName);
+                    viewPager.setAdapter(adapter);
+                    viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+                    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                        @Override
+                        public void onTabSelected(TabLayout.Tab tab) {
+                            viewPager.setCurrentItem(tab.getPosition());
+                        }
+
+                        @Override
+                        public void onTabUnselected(TabLayout.Tab tab) {
+                        }
+
+                        @Override
+                        public void onTabReselected(TabLayout.Tab tab) {
+                        }
+                    });
+                } else {
+                    Log.e(TAG, "Image link or name is null");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to fetch data", databaseError.toException());
+            }
+        });
     }
 
     private void fetchUserNames() {
@@ -174,8 +186,7 @@ public class RecipeActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("SendStickerActivity", "Error fetching user names",
-                        databaseError.toException());
+                Log.e("RecipeActivity", "Error fetching user names", databaseError.toException());
             }
         });
     }
@@ -187,13 +198,12 @@ public class RecipeActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         Spinner usernameSpinner = dialogView.findViewById(R.id.usernameSpinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(RecipeActivity.this,
-                android.R.layout.simple_spinner_item, userNames);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(RecipeActivity.this, android.R.layout.simple_spinner_item, userNames);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         usernameSpinner.setAdapter(adapter);
 
         builder.setView(dialogView);
-        builder.setTitle("Whom do you want to send ?")
+        builder.setTitle("Whom do you want to send?")
                 .setPositiveButton("Send", (dialog, which) -> {
                     String selectedUsername = usernameSpinner.getSelectedItem().toString();
                     if (!selectedUsername.isEmpty()) {
@@ -208,13 +218,12 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void sendMessageToUser(String selectedUsername) {
-        String chatroomid = getChatroomId(currentUser, selectedUsername);
+        String chatroomId = getChatroomId(currentUser, selectedUsername);
         // Get a reference to the chats node
-        DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("chatrooms/" + chatroomid + "/chats");
+        DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("chatrooms/" + chatroomId + "/chats");
 
         // Create a new message object
-        ChatMessage message = new ChatMessage("Test Message", currentUser, selectedUsername,
-                System.currentTimeMillis());
+        ChatMessage message = new ChatMessage("Test Message", currentUser, selectedUsername, System.currentTimeMillis());
 
         // Get a new key for the message
         String messageId = chatsRef.push().getKey();
@@ -236,6 +245,4 @@ public class RecipeActivity extends AppCompatActivity {
             return otherUser + "_" + currentUser;
         }
     }
-
-
 }

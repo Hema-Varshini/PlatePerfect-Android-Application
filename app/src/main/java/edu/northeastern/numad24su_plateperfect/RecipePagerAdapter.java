@@ -8,10 +8,12 @@ import androidx.fragment.app.FragmentPagerAdapter;
 public class RecipePagerAdapter extends FragmentPagerAdapter {
 
     private int numOfTabs;
+    private String recipeName;
 
-    public RecipePagerAdapter(@NonNull FragmentManager fm, int numOfTabs) {
-        super(fm);
+    public RecipePagerAdapter(@NonNull FragmentManager fm, int numOfTabs, String recipeName) {
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.numOfTabs = numOfTabs;
+        this.recipeName = recipeName;
     }
 
     @NonNull
@@ -19,11 +21,11 @@ public class RecipePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new DetailsFragment();
+                return new DetailsFragment(); // Update this to pass recipe details if needed
             case 1:
-                return new IngredientsFragment();
+                return IngredientsFragment.newInstance(recipeName);
             case 2:
-                return new InstructionsFragment();
+                return InstructionsFragment.newInstance(recipeName);
             default:
                 return null;
         }

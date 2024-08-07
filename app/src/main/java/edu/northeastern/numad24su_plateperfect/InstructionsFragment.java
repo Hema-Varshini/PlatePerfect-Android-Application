@@ -4,20 +4,89 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class InstructionsFragment extends Fragment {
+
+    private static final String ARG_RECIPE_NAME = "recipe_name";
+    private String recipeName;
+    private DatabaseReference databaseReference;
+    private LinearLayout instructionsLayout;
+
+    public InstructionsFragment() {
+        // Required empty public constructor
+    }
+
+    public static InstructionsFragment newInstance(String recipeName) {
+        InstructionsFragment fragment = new InstructionsFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_RECIPE_NAME, recipeName);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            recipeName = getArguments().getString(ARG_RECIPE_NAME);
+        }
+
+        // Initialize Firebase Database reference
+        databaseReference = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference().child("instructions");
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_instructions, container, false);
-        TextView instructionsTextView = view.findViewById(R.id.instructions_text);
-        // Set instructions text
-        instructionsTextView.setText("1. Boil the pasta.\n2. Cook the vegetables.\n3. Mix pasta with vegetables.\n4. Add sauce and serve.");
+        instructionsLayout = view.findViewById(R.id.instructions_layout);
+
+        // Fetch and display instructions
+        fetchInstructions();
+
         return view;
+    }
+
+    private void fetchInstructions() {
+        databaseReference.orderByChild("recipe").equalTo(recipeName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String instruction = snapshot.child("instruction").getValue(String.class);
+                    Long step = snapshot.child("step").getValue(Long.class);
+
+                    if (instruction != null && step != null) {
+                        addInstructionToLayout(step, instruction);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle possible errors.
+            }
+        });
+    }
+
+    private void addInstructionToLayout(Long step, String instruction) {
+        View instructionView = getLayoutInflater().inflate(R.layout.item_instruction, instructionsLayout, false);
+        TextView instructionStep = instructionView.findViewById(R.id.instruction_step);
+        TextView instructionText = instructionView.findViewById(R.id.instruction_text);
+
+        instructionStep.setText("Step " + step);
+        instructionText.setText(instruction);
+
+        instructionsLayout.addView(instructionView);
     }
 }
