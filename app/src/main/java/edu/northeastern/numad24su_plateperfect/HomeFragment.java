@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        databaseReferenceImages = FirebaseDatabase.getInstance().getReference("images");
+        databaseReferenceImages = FirebaseDatabase.getInstance().getReference("PlatePerfect");
 
         rvParentRecyclerView = view.findViewById(R.id.rv_parent);
         rvParentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -134,7 +134,7 @@ public class HomeFragment extends Fragment {
 
                 // Log the fetched data
                 for (rvChildModelClass imageData : fillCategoryList) {
-                    Log.d("ImagesFragment", "Category: " + categoryKey + " Link: " + imageData.getLink() + ", Recipe: " + imageData.getRecipe());
+                    Log.d("ImagesFragment", "Category: " + categoryKey + " Name: " + imageData.getName() + ", Image Link: " + imageData.getImage_Link());
                 }
             }
 

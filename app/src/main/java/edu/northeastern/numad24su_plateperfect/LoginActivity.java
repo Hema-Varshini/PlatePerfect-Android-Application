@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         btnLogin = findViewById(R.id.btnLogin);
         username = findViewById(R.id.editTextUsername);
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        databaseReference = FirebaseDatabase.getInstance().getReference("PlatePerfect");
         Intent intent = new Intent(LoginActivity.this, BottomNavBarActivity.class);
         startActivity(intent);
         btnLogin.setOnClickListener(v -> {
