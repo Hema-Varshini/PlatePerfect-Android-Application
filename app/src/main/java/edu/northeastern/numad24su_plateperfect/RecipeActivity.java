@@ -41,6 +41,7 @@ public class RecipeActivity extends AppCompatActivity {
     private DatabaseReference mdatabase;
     private ImageView recipeImage;
     private TextView recipeName;
+    private ImageButton likeButton;
     private String fetchedRecipeName;
 
     @Override
@@ -55,7 +56,7 @@ public class RecipeActivity extends AppCompatActivity {
 
         // Set up UI elements
         recipeImage = findViewById(R.id.recipe_image);
-        ImageButton likeButton = findViewById(R.id.like_button);
+        likeButton = findViewById(R.id.like_button);
         ImageButton shareButton = findViewById(R.id.share_button);
         ImageButton playButton = findViewById(R.id.play_button);
         recipeName = findViewById(R.id.recipe_name);
@@ -73,6 +74,7 @@ public class RecipeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 isLiked = !isLiked;
+                updateLikeStatus(isLiked);
                 likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
             }
         });
@@ -161,6 +163,9 @@ public class RecipeActivity extends AppCompatActivity {
                         public void onTabReselected(TabLayout.Tab tab) {
                         }
                     });
+
+                    // Check initial like status
+                    checkInitialLikeStatus();
                 } else {
                     Log.e(TAG, "Image link or name is null");
                 }
@@ -244,5 +249,32 @@ public class RecipeActivity extends AppCompatActivity {
         } else {
             return otherUser + "_" + currentUser;
         }
+    }
+
+    private void updateLikeStatus(boolean liked) {
+        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getId());
+        likeRef.child("liked").setValue(liked ? 1 : 0);
+    }
+
+    private void checkInitialLikeStatus() {
+        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getId());
+        likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    isLiked = snapshot.child("liked").getValue(Integer.class) == 1;
+                    likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
+                } else {
+                    // Initialize the like status in Firebase if it doesn't exist
+                    likeRef.child("liked").setValue(0);
+                    isLiked = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Failed to check initial like status", error.toException());
+            }
+        });
     }
 }
