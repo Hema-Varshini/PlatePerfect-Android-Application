@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/cookMenu"
+        android:icon="@drawable/baseline_cloudy_snowing_24"
+        android:title="Cook" />
+    <item
+        android:id="@+id/homeMenu"
+        android:icon="@drawable/baseline_cloudy_snowing_24"
+        android:title="Home" />
+    <item
+        android:id="@+id/profileMenu"
+        android:icon="@drawable/baseline_coffee_maker_24"
+        android:title="Profile" />
+</menu>
