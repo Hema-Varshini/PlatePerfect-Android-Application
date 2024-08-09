@@ -43,6 +43,7 @@ public class RecipeActivity extends AppCompatActivity {
     private TextView recipeName;
     private ImageButton likeButton;
     private String fetchedRecipeName;
+    private String fetchedDescription;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -136,6 +137,7 @@ public class RecipeActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String imageLink = dataSnapshot.child("Image_link").getValue(String.class);
                 String name = dataSnapshot.child("Name").getValue(String.class);
+                fetchedDescription = dataSnapshot.child("description").getValue(String.class);
 
                 if (imageLink != null && name != null) {
                     // Update the UI with the fetched data
@@ -146,7 +148,7 @@ public class RecipeActivity extends AppCompatActivity {
                     // Set up TabLayout and ViewPager
                     TabLayout tabLayout = findViewById(R.id.tab_layout);
                     ViewPager viewPager = findViewById(R.id.view_pager);
-                    final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fetchedRecipeName);
+                    final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fetchedRecipeName, fetchedDescription);
                     viewPager.setAdapter(adapter);
                     viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
                     tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -167,7 +169,7 @@ public class RecipeActivity extends AppCompatActivity {
                     // Check initial like status
                     checkInitialLikeStatus();
                 } else {
-                    Log.e(TAG, "Image link or name is null");
+                    Log.e(TAG, "Image link, name, or description is null");
                 }
             }
 

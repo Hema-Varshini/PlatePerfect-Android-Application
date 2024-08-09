@@ -9,11 +9,13 @@ public class RecipePagerAdapter extends FragmentPagerAdapter {
 
     private int numOfTabs;
     private String recipeName;
+    private String recipeDescription;
 
-    public RecipePagerAdapter(@NonNull FragmentManager fm, int numOfTabs, String recipeName) {
+    public RecipePagerAdapter(@NonNull FragmentManager fm, int numOfTabs, String recipeName, String recipeDescription) {
         super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.numOfTabs = numOfTabs;
         this.recipeName = recipeName;
+        this.recipeDescription = recipeDescription;
     }
 
     @NonNull
@@ -21,7 +23,7 @@ public class RecipePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new DetailsFragment(); // Update this to pass recipe details if needed
+                return DetailsFragment.newInstance(recipeName, recipeDescription); // Pass the recipe name and description to DetailsFragment
             case 1:
                 return IngredientsFragment.newInstance(recipeName);
             case 2:
