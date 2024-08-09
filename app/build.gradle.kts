@@ -40,6 +40,7 @@ android {
 
 dependencies {
 
+    implementation("com.google.firebase:firebase-messaging:15.0.2")
     implementation("com.squareup.picasso:picasso:2.8")
     implementation(libs.appcompat)
     implementation(libs.material)
