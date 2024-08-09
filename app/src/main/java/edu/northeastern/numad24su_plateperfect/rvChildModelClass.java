@@ -9,12 +9,13 @@ public class rvChildModelClass {
     private double Rating;
     private String Tagline;
     private String Type;
+    private String Description;
 
     // No-argument constructor required for Firebase
     public rvChildModelClass() {
     }
 
-    public rvChildModelClass(int Cook_time, String Cuisine, String Image_Link, String Name, int Prep_time, double Rating, String Tagline, String Type) {
+    public rvChildModelClass(int Cook_time, String Cuisine, String Image_Link, String Name, int Prep_time, double Rating, String Tagline, String Type,String Description) {
         this.Cook_time = Cook_time;
         this.Cuisine = Cuisine;
         this.Image_Link = Image_Link;
@@ -23,6 +24,7 @@ public class rvChildModelClass {
         this.Rating = Rating;
         this.Tagline = Tagline;
         this.Type = Type;
+        this.Description=Description;
     }
 
     public int getCook_time() {
@@ -48,9 +50,15 @@ public class rvChildModelClass {
     public void setImage_Link(String Image_Link) {
         this.Image_Link = Image_Link;
     }
+    public void setDescription(String Description) {
+        this.Description = Description;
+    }
 
     public String getName() {
         return Name;
+    }
+    public String getDescription() {
+        return Description;
     }
 
     public void setName(String Name) {
