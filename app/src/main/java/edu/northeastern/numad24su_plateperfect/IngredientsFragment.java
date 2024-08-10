@@ -43,7 +43,7 @@ public class IngredientsFragment extends Fragment {
         }
 
         // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance().getReference().child("recipe_ingredients");
+        databaseReference = FirebaseDatabase.getInstance().getReference("recipe_ingredients");
     }
 
     @Nullable
@@ -64,7 +64,7 @@ public class IngredientsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String name = snapshot.child("name").getValue(String.class);
-                    String qty = snapshot.child("qty").getValue(String.class);
+                    String qty = String.valueOf(snapshot.child("qty").getValue(Object.class));
                     String unit = snapshot.child("unit").getValue(String.class);
 
                     if (name != null && qty != null && unit != null) {

@@ -1,6 +1,7 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class InstructionsFragment extends Fragment {
         }
 
         // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference().child("instructions");
+        databaseReference = FirebaseDatabase.getInstance().getReference("instuctions");
     }
 
     @Nullable
@@ -51,7 +52,7 @@ public class InstructionsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_instructions, container, false);
         instructionsLayout = view.findViewById(R.id.instructions_layout);
-
+        Log.d("InstructionsFragment", "Recipe Name: " + recipeName);
         // Fetch and display instructions
         fetchInstructions();
 
@@ -65,7 +66,6 @@ public class InstructionsFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String instruction = snapshot.child("instruction").getValue(String.class);
                     Long step = snapshot.child("step").getValue(Long.class);
-
                     if (instruction != null && step != null) {
                         addInstructionToLayout(step, instruction);
                     }
