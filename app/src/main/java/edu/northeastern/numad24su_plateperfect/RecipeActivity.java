@@ -100,45 +100,24 @@ public class RecipeActivity extends AppCompatActivity {
         recipeImage.setOnClickListener(playVideoListener);
 
         // Initialize Firebase Database reference
-        mdatabase = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference();
+        mdatabase = FirebaseDatabase.getInstance().getReference("PlatePerfect");
 
         // Fetch data from Firebase
         fetchRecipeData();
 
-        mdatabase.child("latest/" + currentUser).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                // new child added is new message received
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Toast.makeText(RecipeActivity.this, "New Message Received", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
     }
 
     private void fetchRecipeData() {
         // Fetch the image link and recipe name from Firebase
-        mdatabase.child("recipes").child("1").addListenerForSingleValueEvent(new ValueEventListener() {
+        mdatabase.child("1").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String imageLink = dataSnapshot.child("Image_link").getValue(String.class);
+                String imageLink = dataSnapshot.child("Image_Link").getValue(String.class);
                 String name = dataSnapshot.child("Name").getValue(String.class);
-                fetchedDescription = dataSnapshot.child("description").getValue(String.class);
-
+                fetchedDescription = dataSnapshot.child("Description").getValue(String.class);
+                Log.d(TAG, "Fetched description: " + fetchedDescription);
+                Log.d(TAG, "Fetched name: " + name);
+                Log.d(TAG, "Fetched image link: " + imageLink);
                 if (imageLink != null && name != null) {
                     // Update the UI with the fetched data
                     Picasso.get().load(imageLink).into(recipeImage);
@@ -167,7 +146,7 @@ public class RecipeActivity extends AppCompatActivity {
                     });
 
                     // Check initial like status
-                    checkInitialLikeStatus();
+                    // checkInitialLikeStatus();
                 } else {
                     Log.e(TAG, "Image link, name, or description is null");
                 }
