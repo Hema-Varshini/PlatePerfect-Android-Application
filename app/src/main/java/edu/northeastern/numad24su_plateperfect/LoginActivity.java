@@ -59,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (usernameExists) {
                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                     // Navigate to next activity
-                    Intent intent = new Intent(LoginActivity.this, ChatsActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, BottomNavBarActivity.class);
                     intent.putExtra("currentUser", username);
                     startActivity(intent);
                 } else {

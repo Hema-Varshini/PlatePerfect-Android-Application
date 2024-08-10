@@ -13,4 +13,9 @@
         android:id="@+id/profileMenu"
         android:icon="@drawable/baseline_coffee_maker_24"
         android:title="Profile" />
+    <item
+        android:id="@+id/chatsMenu"
+        android:icon="@drawable/baseline_chat_24"
+        android:title="Chats" />
+
 </menu>
