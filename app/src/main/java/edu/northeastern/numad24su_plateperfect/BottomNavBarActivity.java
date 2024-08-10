@@ -32,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.numad24su_plateperfect.databinding.ActivityBottomNavBarBinding;
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
 
 public class BottomNavBarActivity extends AppCompatActivity {
     ActivityBottomNavBarBinding binding;
@@ -54,7 +55,8 @@ public class BottomNavBarActivity extends AppCompatActivity {
         binding = ActivityBottomNavBarBinding.inflate(getLayoutInflater());
         Intent intent = getIntent();
         //currentUser = intent.getStringExtra("currentUser");
-        currentUser ="test";
+        currentUser ="test2";
+        FirebaseUtil.setCurrentUser(currentUser);
 
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setSelectedItemId(R.id.homeMenu);

@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class RecipeActivity extends AppCompatActivity {
 
     private static final String TAG = "RecipeActivity";
@@ -56,7 +58,7 @@ public class RecipeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipe);
 
         // For demonstration purposes, hardcoding the currentUser
-        currentUser = "Shashank";
+        currentUser = FirebaseUtil.getCurrentUser();
 
         fetchUserNames();
 //        // Initialize the recipe (this should be retrieved from your database or passed via intent)
@@ -66,7 +68,7 @@ public class RecipeActivity extends AppCompatActivity {
 //        ingredients.put("Tomatoes", "2");
 //        recipe = new Recipe("1", "Pasta", "Delicious homemade pasta", ingredients, "Step by step instructions");
 
-        recipe = getIntent().getParcelableExtra("recipe");
+
         // Set up UI elements
         recipeImage = findViewById(R.id.recipe_image);
         likeButton = findViewById(R.id.like_button);
@@ -139,8 +141,37 @@ public class RecipeActivity extends AppCompatActivity {
         mdatabase = FirebaseDatabase.getInstance().getReference("PlatePerfect");
 
         // Fetch data from Firebase
-        fetchRecipeData();
-        checkInitialLikeStatus();
+        recipe = getIntent().getParcelableExtra("recipe");
+        if(recipe == null){
+            fetchThisRecipe();
+        }else{
+            fetchRecipeData();
+            checkInitialLikeStatus();
+        }
+
+    }
+
+    private void fetchThisRecipe() {
+        Log.d(TAG, "Fetching recipe: " + getIntent().getStringExtra("recipeName"));
+        mdatabase.orderByChild("Name").equalTo(getIntent().getStringExtra("recipeName")).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getChildrenCount() == 0){
+                    Toast.makeText(RecipeActivity.this, "Recipe not found", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        recipe = snapshot.getValue(rvChildModelClass.class);
+                        fetchRecipeData();
+                        checkInitialLikeStatus();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle possible errors.
+            }
+        });
     }
 
     private void likeTheRecipe() {
@@ -240,7 +271,8 @@ public class RecipeActivity extends AppCompatActivity {
         DatabaseReference chatsRef = FirebaseDatabase.getInstance().getReference("chatrooms/" + chatroomId + "/chats");
 
         // Create a new message object
-        ChatMessage message = new ChatMessage("Test Message", currentUser, selectedUsername, System.currentTimeMillis());
+        ChatMessage message = new ChatMessage(recipe.getName(),
+                currentUser, selectedUsername, System.currentTimeMillis());
 
         // Get a new key for the message
         String messageId = chatsRef.push().getKey();
