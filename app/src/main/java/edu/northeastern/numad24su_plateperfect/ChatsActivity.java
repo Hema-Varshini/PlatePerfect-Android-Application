@@ -92,8 +92,8 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
                         String username = currentUser; // Implement this method to get the username
 
                         if (username != null) {
-                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(username);
-                            userRef.child("fcmToken").setValue(token)
+                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("fcmTokens").child(username);
+                            userRef.setValue(token)
                                     .addOnCompleteListener(fcmtask -> {
                                         if (fcmtask.isSuccessful()) {
                                             Log.d(TAG, "Token stored successfully.");
@@ -131,14 +131,13 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 usersList.clear();  // Clear the list before adding new data
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                    String username = userSnapshot.child("username").getValue(String.class);
-                    User userModel = new User(username);
-                    if (username != null && !username.equals(currentUser)) {
-                        usersList.add(userModel);
+                    User user = userSnapshot.getValue(User.class);
+                    if (user.getUsername() != null && !user.getUsername().equals(currentUser)) {
+                        usersList.add(user);
                     }
                 }
-                usersList.add(new User("shank"));
-                usersList.add(new User("Test"));
+//                usersList.add(new User("shank"));
+//                usersList.add(new User("Test"));
                 recyclerviewAdapter.notifyDataSetChanged();  // Notify the adapter to refresh the ListView
             }
 
