@@ -1,6 +1,11 @@
 package edu.northeastern.numad24su_plateperfect;
 
-public class rvChildModelClass {
+import android.content.Context;
+import android.content.Intent;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class rvChildModelClass implements Parcelable {
     private int Cook_time;
     private String Cuisine;
     private String Image_Link;
@@ -15,7 +20,7 @@ public class rvChildModelClass {
     public rvChildModelClass() {
     }
 
-    public rvChildModelClass(int Cook_time, String Cuisine, String Image_Link, String Name, int Prep_time, double Rating, String Tagline, String Type,String Description) {
+    public rvChildModelClass(int Cook_time, String Cuisine, String Image_Link, String Name, int Prep_time, double Rating, String Tagline, String Type, String Description) {
         this.Cook_time = Cook_time;
         this.Cuisine = Cuisine;
         this.Image_Link = Image_Link;
@@ -24,9 +29,52 @@ public class rvChildModelClass {
         this.Rating = Rating;
         this.Tagline = Tagline;
         this.Type = Type;
-        this.Description=Description;
+        this.Description = Description;
     }
 
+    protected rvChildModelClass(Parcel in) {
+        Cook_time = in.readInt();
+        Cuisine = in.readString();
+        Image_Link = in.readString();
+        Name = in.readString();
+        Prep_time = in.readInt();
+        Rating = in.readDouble();
+        Tagline = in.readString();
+        Type = in.readString();
+        Description = in.readString();
+    }
+
+    public static final Creator<rvChildModelClass> CREATOR = new Creator<rvChildModelClass>() {
+        @Override
+        public rvChildModelClass createFromParcel(Parcel in) {
+            return new rvChildModelClass(in);
+        }
+
+        @Override
+        public rvChildModelClass[] newArray(int size) {
+            return new rvChildModelClass[size];
+        }
+    };
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(Cook_time);
+        dest.writeString(Cuisine);
+        dest.writeString(Image_Link);
+        dest.writeString(Name);
+        dest.writeInt(Prep_time);
+        dest.writeDouble(Rating);
+        dest.writeString(Tagline);
+        dest.writeString(Type);
+        dest.writeString(Description);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // Getters and Setters
     public int getCook_time() {
         return Cook_time;
     }
@@ -50,15 +98,9 @@ public class rvChildModelClass {
     public void setImage_Link(String Image_Link) {
         this.Image_Link = Image_Link;
     }
-    public void setDescription(String Description) {
-        this.Description = Description;
-    }
 
     public String getName() {
         return Name;
-    }
-    public String getDescription() {
-        return Description;
     }
 
     public void setName(String Name) {
@@ -95,5 +137,26 @@ public class rvChildModelClass {
 
     public void setType(String Type) {
         this.Type = Type;
+    }
+
+    public String getDescription() {
+        return Description;
+    }
+
+    public void setDescription(String Description) {
+        this.Description = Description;
+    }
+
+    public String getVideoUrl() {
+        // Return the video URL for the recipe
+        return "https://www.youtube.com/results?search_query="+getName(); // Example URL
+    }
+    public void shareRecipe(Context context) {
+        // Logic to handle share functionality
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getName() + "\n" + getDescription() + "\n" + "Watch the recipe video: " + getVideoUrl());
+        shareIntent.setType("text/plain");
+        context.startActivity(Intent.createChooser(shareIntent, "Share via"));
     }
 }

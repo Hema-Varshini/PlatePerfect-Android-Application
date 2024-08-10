@@ -1,6 +1,7 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +37,18 @@ public class aChildAdapterClass extends RecyclerView.Adapter<aChildAdapterClass.
         rvChildModelClass model = rvChildModelClassList.get(position);
         String url = model.getImage_Link();
         Picasso.get().load(url).into(holder.ivChildImage);
-        holder.ivChildTitle.setText(rvChildModelClassList.get(position).getName());
-        //holder.ivChildImage.setOnClickListener(); //ToDO direct to recipe page
+        holder.ivChildTitle.setText(model.getName());
+        //ToDO direct to recipe page
+        holder.ivChildImage.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, RecipeActivity.class);
+                        intent.putExtra("recipe", model);
+                        context.startActivity(intent);
+                    }
+                }
+        );
 
     }
 

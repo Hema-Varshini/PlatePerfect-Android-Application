@@ -53,7 +53,8 @@ public class BottomNavBarActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityBottomNavBarBinding.inflate(getLayoutInflater());
         Intent intent = getIntent();
-        currentUser = intent.getStringExtra("currentUser");
+        //currentUser = intent.getStringExtra("currentUser");
+        currentUser ="test";
 
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setSelectedItemId(R.id.homeMenu);

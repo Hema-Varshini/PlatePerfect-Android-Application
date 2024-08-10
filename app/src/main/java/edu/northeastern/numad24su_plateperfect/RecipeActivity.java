@@ -38,7 +38,7 @@ import java.util.Map;
 public class RecipeActivity extends AppCompatActivity {
 
     private static final String TAG = "RecipeActivity";
-    private Recipe recipe;
+    private rvChildModelClass recipe;
     private boolean isLiked = false;
     private List<String> userNames = new ArrayList<>();
     private String currentUser;
@@ -59,14 +59,14 @@ public class RecipeActivity extends AppCompatActivity {
         currentUser = "Shashank";
 
         fetchUserNames();
-        // Initialize the recipe (this should be retrieved from your database or passed via intent)
-        Map<String, String> ingredients = new HashMap<>();
-        ingredients.put("Rice", "2 bowls");
-        ingredients.put("Onion", "2");
-        ingredients.put("Tomatoes", "2");
-        recipe = new Recipe("1", "Pasta", "Delicious homemade pasta", ingredients, "Step by step instructions");
+//        // Initialize the recipe (this should be retrieved from your database or passed via intent)
+//        Map<String, String> ingredients = new HashMap<>();
+//        ingredients.put("Rice", "2 bowls");
+//        ingredients.put("Onion", "2");
+//        ingredients.put("Tomatoes", "2");
+//        recipe = new Recipe("1", "Pasta", "Delicious homemade pasta", ingredients, "Step by step instructions");
 
-
+        recipe = getIntent().getParcelableExtra("recipe");
         // Set up UI elements
         recipeImage = findViewById(R.id.recipe_image);
         likeButton = findViewById(R.id.like_button);
@@ -140,7 +140,7 @@ public class RecipeActivity extends AppCompatActivity {
 
         // Fetch data from Firebase
         fetchRecipeData();
-
+        checkInitialLikeStatus();
     }
 
     private void likeTheRecipe() {
@@ -150,55 +150,44 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void fetchRecipeData() {
-        // Fetch the image link and recipe name from Firebase
-        mdatabase.child("1").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String imageLink = dataSnapshot.child("Image_Link").getValue(String.class);
-                String name = dataSnapshot.child("Name").getValue(String.class);
-                fetchedDescription = dataSnapshot.child("Description").getValue(String.class);
-                Log.d(TAG, "Fetched description: " + fetchedDescription);
-                Log.d(TAG, "Fetched name: " + name);
-                Log.d(TAG, "Fetched image link: " + imageLink);
-                if (imageLink != null && name != null) {
-                    // Update the UI with the fetched data
-                    Picasso.get().load(imageLink).into(recipeImage);
-                    recipeName.setText(name);
-                    fetchedRecipeName = name;
+        String imageLink = recipe.getImage_Link();
+        String name = recipe.getName();
+        fetchedDescription = recipe.getDescription();
+        Log.d(TAG, "Fetched description: " + fetchedDescription);
+        Log.d(TAG, "Fetched name: " + name);
+        Log.d(TAG, "Fetched image link: " + imageLink);
+        if (imageLink != null && name != null) {
+            // Update the UI with the fetched data
+            Picasso.get().load(imageLink).into(recipeImage);
+            recipeName.setText(name);
+            fetchedRecipeName = name;
 
-                    // Set up TabLayout and ViewPager
-                    TabLayout tabLayout = findViewById(R.id.tab_layout);
-                    ViewPager viewPager = findViewById(R.id.view_pager);
-                    final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fetchedRecipeName, fetchedDescription);
-                    viewPager.setAdapter(adapter);
-                    viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-                    tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                        @Override
-                        public void onTabSelected(TabLayout.Tab tab) {
-                            viewPager.setCurrentItem(tab.getPosition());
-                        }
-
-                        @Override
-                        public void onTabUnselected(TabLayout.Tab tab) {
-                        }
-
-                        @Override
-                        public void onTabReselected(TabLayout.Tab tab) {
-                        }
-                    });
-
-                    // Check initial like status
-                    // checkInitialLikeStatus();
-                } else {
-                    Log.e(TAG, "Image link, name, or description is null");
+            // Set up TabLayout and ViewPager
+            TabLayout tabLayout = findViewById(R.id.tab_layout);
+            ViewPager viewPager = findViewById(R.id.view_pager);
+            final RecipePagerAdapter adapter = new RecipePagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), fetchedRecipeName, fetchedDescription);
+            viewPager.setAdapter(adapter);
+            viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    viewPager.setCurrentItem(tab.getPosition());
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e(TAG, "Failed to fetch data", databaseError.toException());
-            }
-        });
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
+
+            // Check initial like status
+
+        } else {
+            Log.e(TAG, "Image link, name, or description is null");
+        }
     }
 
     private void fetchUserNames() {
@@ -275,21 +264,21 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void updateLikeStatus(boolean liked) {
-        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getId());
-        likeRef.child("liked").setValue(liked ? 1 : 0);
+        DatabaseReference likeRef = FirebaseDatabase.getInstance().getReference("likes").child(currentUser).child(recipe.getName());
+        likeRef.setValue(liked ? 1 : 0);
     }
 
     private void checkInitialLikeStatus() {
-        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getId());
+        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getName());
         likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    isLiked = snapshot.child("liked").getValue(Integer.class) == 1;
+                    isLiked = snapshot.getValue(Integer.class) == 1;
                     likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
                 } else {
                     // Initialize the like status in Firebase if it doesn't exist
-                    likeRef.child("liked").setValue(0);
+                    likeRef.setValue(0);
                     isLiked = false;
                 }
             }
