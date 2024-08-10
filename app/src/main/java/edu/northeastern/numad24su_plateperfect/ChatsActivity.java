@@ -56,8 +56,8 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         super.onCreate(savedInstanceState);
         inflate();
         Intent intent = getIntent();
-        //currentUser = intent.getStringExtra("currentUser");
-        currentUser = "Shashank";
+        currentUser = intent.getStringExtra("currentUser");
+        //currentUser = "Shashank";
         usersList = new ArrayList<User>();
         userdatabaseReference = FirebaseDatabase.getInstance().getReference("users");
         recyclerview = findViewById(R.id.chatsRecyclerView);
@@ -173,6 +173,7 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
     }
 
     private void passUserModelAsIntent(Intent intent, User user) {
+        intent.putExtra("currentUser",currentUser);
         intent.putExtra("sender",user.getUsername());
 //        intent.putExtra("phone",user.getPhone());
 //        intent.putExtra("userId",model.getUserId());

@@ -35,7 +35,7 @@ public class ChatsActivityAdapter extends RecyclerView.Adapter<ChatsActivityAdap
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         User model = firebaseRTBDUserModelArrayListResponseModelList.get(position);
-        holder.username.setText(model.username);
+        holder.usernameTextVw.setText(model.getUsername());
     }
 
     @Override
@@ -46,18 +46,18 @@ public class ChatsActivityAdapter extends RecyclerView.Adapter<ChatsActivityAdap
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
 
 
-        TextView username;
+        TextView usernameTextVw;
 
         public ChatViewHolder(@NonNull View itemView, IMessageDisplayListener iMessageDisplayListener) {
             super(itemView);
-            username = itemView.findViewById(R.id.textViewUsername);
+            usernameTextVw = itemView.findViewById(R.id.textViewUsername);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(iMessageDisplayListener!=null){
                         int pos = getAdapterPosition();
                         if(pos!= RecyclerView.NO_POSITION){
-                            iMessageDisplayListener.onUserClicked(pos,username.getText().toString());
+                            iMessageDisplayListener.onUserClicked(pos, usernameTextVw.getText().toString());
                         }
 
                     }

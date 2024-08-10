@@ -56,8 +56,8 @@ public class MessageActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        //currentUser = intent.getStringExtra("currentUser");
-        currentUser = "shank";
+        currentUser = intent.getStringExtra("currentUser");
+        //currentUser = "shank";
 
         //get UserModel
         otherUser = getUserModelFromIntent(intent);
