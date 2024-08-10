@@ -57,20 +57,16 @@ public class BottomNavBarActivity extends AppCompatActivity {
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
-
-            if(item.getItemId() == R.id.cookMenu){
-                selectedFragment = new CookFragment();
-            } else if (item.getItemId() == R.id.homeMenu) {
+            Bundle bundle = new Bundle();
+            bundle.putString("currentUser", currentUser);
+            if (item.getItemId() == R.id.homeMenu) {
                 selectedFragment = new HomeFragment();
             } else if (item.getItemId() == R.id.chatsMenu) {
                 selectedFragment = new ChatsFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("currentUser", currentUser);
-                selectedFragment.setArguments(bundle);
             } else {
                 selectedFragment = new ProfileFragment();
             }
-
+            selectedFragment.setArguments(bundle);
             replaceFragment(selectedFragment);
             return true;
         });
