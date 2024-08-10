@@ -99,7 +99,7 @@ public class Recipe {
 
     public String getVideoUrl() {
         // Return the video URL for the recipe
-        return "https://www.youtube.com/watch?v=sample_video_url"; // Example URL
+        return "https://www.youtube.com/results?search_query="+name; // Example URL
     }
 
     public String getImageUrl() {

@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
@@ -46,6 +48,7 @@ public class RecipeActivity extends AppCompatActivity {
     private ImageButton likeButton;
     private String fetchedRecipeName;
     private String fetchedDescription;
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,15 +81,36 @@ public class RecipeActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> {
             sendThisRecipe();
         });
+        // Initialize GestureDetector
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                // Toggle like status on double tap
+                likeTheRecipe();
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                // Call performClick when a single tap is detected
+                // This will trigger the onClickListener
+                return true;
+            }
+        });
+
+        // Set OnTouchListener on the root layout
+        View rootView = findViewById(android.R.id.content);
+        // On Double Tap
+        rootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         // Set up like button click listener
-        likeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isLiked = !isLiked;
-                updateLikeStatus(isLiked);
-                likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
-            }
+        likeButton.setOnClickListener(v -> {
+            likeTheRecipe();
         });
 
         // Set up share button click listener
@@ -97,16 +121,15 @@ public class RecipeActivity extends AppCompatActivity {
             }
         });
 
-        // Set up play button click listener
-        View.OnClickListener playVideoListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
-                startActivity(intent);
-            }
-        };
-        playButton.setOnClickListener(playVideoListener);
-        recipeImage.setOnClickListener(playVideoListener);
+        playButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
+            startActivity(intent);
+        });
+        recipeImage.setOnClickListener(v -> {
+            Log.d(TAG, "Opening video URL: " + recipe.getVideoUrl());
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
+            startActivity(intent);
+        });
         // Set up TabLayout and ViewPager
         tabLayout.addTab(tabLayout.newTab().setText("Details"));
         tabLayout.addTab(tabLayout.newTab().setText("Ingredients"));
@@ -118,6 +141,12 @@ public class RecipeActivity extends AppCompatActivity {
         // Fetch data from Firebase
         fetchRecipeData();
 
+    }
+
+    private void likeTheRecipe() {
+        isLiked = !isLiked;
+        updateLikeStatus(isLiked);
+        likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
     }
 
     private void fetchRecipeData() {
