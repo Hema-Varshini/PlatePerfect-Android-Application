@@ -43,7 +43,7 @@ public class IngredientsFragment extends Fragment {
         }
 
         // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference().child("recipe_ingredients");
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("recipe_ingredients");
     }
 
     @Nullable

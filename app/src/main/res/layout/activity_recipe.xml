@@ -68,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/recipe_name"
-        app:tabTextColor="@color/white"
+        app:tabTextColor="@color/icon_color"
         android:layout_marginTop="8dp" />
 
     <androidx.viewpager.widget.ViewPager

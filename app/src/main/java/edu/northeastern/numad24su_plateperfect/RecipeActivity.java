@@ -29,7 +29,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RecipeActivity extends AppCompatActivity {
 
@@ -54,6 +56,13 @@ public class RecipeActivity extends AppCompatActivity {
         currentUser = "Shashank";
 
         fetchUserNames();
+        // Initialize the recipe (this should be retrieved from your database or passed via intent)
+        Map<String, String> ingredients = new HashMap<>();
+        ingredients.put("Rice", "2 bowls");
+        ingredients.put("Onion", "2");
+        ingredients.put("Tomatoes", "2");
+        recipe = new Recipe("1", "Pasta", "Delicious homemade pasta", ingredients, "Step by step instructions");
+
 
         // Set up UI elements
         recipeImage = findViewById(R.id.recipe_image);
@@ -98,7 +107,11 @@ public class RecipeActivity extends AppCompatActivity {
         };
         playButton.setOnClickListener(playVideoListener);
         recipeImage.setOnClickListener(playVideoListener);
-
+        // Set up TabLayout and ViewPager
+        tabLayout.addTab(tabLayout.newTab().setText("Details"));
+        tabLayout.addTab(tabLayout.newTab().setText("Ingredients"));
+        tabLayout.addTab(tabLayout.newTab().setText("Instructions"));
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
         // Initialize Firebase Database reference
         mdatabase = FirebaseDatabase.getInstance().getReference("PlatePerfect");
 
