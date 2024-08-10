@@ -279,12 +279,34 @@ public class RecipeActivity extends AppCompatActivity {
 
         // Set the message data
         chatsRef.child(messageId).setValue(message);
-
         // Get a reference to the latest node for the receiver
-        DatabaseReference latestRef = FirebaseDatabase.getInstance().getReference("latest/" + selectedUsername);
+        DatabaseReference latestRef = FirebaseDatabase.getInstance().getReference("latest").child(selectedUsername).child(currentUser);
 
-        // Set the message data
-        latestRef.child(currentUser).setValue(message);
+        // Use addListenerForSingleValueEvent to check if the record exists
+        latestRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // The record exists, handle accordingly (e.g., update it or show a message)
+                    Log.d("Message", "Record already exists. Update it if necessary.");
+                } else {
+                    // The record doesn't exist, proceed with setting the message data
+                    latestRef.setValue(new ChatMessage("Hello", currentUser, selectedUsername, System.currentTimeMillis()));
+                    Log.d("Message", "Record does not exist. Creating a new record.");
+                }
+
+                // Set the message data
+                latestRef.setValue(message);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle possible errors.
+                Log.e("Message", "Error checking if record exists: " + databaseError.getMessage());
+            }
+        });
+
+
     }
 
     private String getChatroomId(String currentUser, String otherUser) {

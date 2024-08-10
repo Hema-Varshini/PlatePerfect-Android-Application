@@ -29,6 +29,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class MessageActivity extends AppCompatActivity {
     // Declare the launcher at the top of your Activity/Fragment:
 
@@ -56,7 +58,7 @@ public class MessageActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        currentUser = intent.getStringExtra("currentUser");
+        currentUser = FirebaseUtil.getCurrentUser();
         //currentUser = "shank";
 
         //get UserModel

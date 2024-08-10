@@ -1,6 +1,9 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -14,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -89,6 +93,22 @@ public class BottomNavBarActivity extends AppCompatActivity {
         //get the fcm token
         getTheFCMToken();
         startListeningForNewMessages();
+        subscribeToUpdates();
+    }
+
+    private void subscribeToUpdates() {
+        FirebaseMessaging.getInstance().subscribeToTopic("newRecipes")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Subscribed";
+                        if (!task.isSuccessful()) {
+                            msg = "Subscribe failed";
+                        }
+
+                        Toast.makeText(BottomNavBarActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void startListeningForNewMessages() {
@@ -97,11 +117,25 @@ public class BottomNavBarActivity extends AppCompatActivity {
                     @Override
                     public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                         // new child added is new message received
+
                     }
 
                     @Override
                     public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                        Toast.makeText(BottomNavBarActivity.this, "New Message Received", Toast.LENGTH_SHORT).show();
+                        ChatMessage  msg = snapshot.getValue(ChatMessage.class);
+                        Intent intent = new Intent(BottomNavBarActivity.this, MessageActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("sender", msg.getSender());
+                        PendingIntent pendingIntent = PendingIntent.getActivity(BottomNavBarActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+                        String channelId = "Default";
+                        NotificationCompat.Builder builder = new  NotificationCompat.Builder(BottomNavBarActivity.this, channelId)
+                                .setSmallIcon(R.mipmap.ic_launcher)
+                                .setContentTitle("New Message From "+ snapshot.getKey())
+                                .setContentText("Hey! Check this new Recipe called " + msg.getMessage()).setAutoCancel(true).setContentIntent(pendingIntent);;
+                        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                        NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
+                        manager.createNotificationChannel(channel);
+                        manager.notify(0, builder.build());
                     }
 
                     @Override
