@@ -11,6 +11,9 @@ public class Recipe {
     private String id;
     private String name;
     private String description;
+    private String imageUrl;
+    private String videoUrl;
+    private String tagLine;
     private Map<String, String> ingredients;
     private String instructions;
     private boolean isLiked;
@@ -19,10 +22,13 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(String id, String name, String description, Map<String, String> ingredients, String instructions) {
+    public Recipe(String id, String name, String description, String imageUrl, String videoUrl, String tagLine, Map<String, String> ingredients, String instructions) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.imageUrl = imageUrl;
+        this.videoUrl = videoUrl;
+        this.tagLine = tagLine;
         this.ingredients = ingredients;
         this.instructions = instructions;
         this.isLiked = false; // Initial state
@@ -51,6 +57,30 @@ public class Recipe {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
+    }
+
+    public String getTagLine() {
+        return tagLine;
+    }
+
+    public void setTagLine(String tagLine) {
+        this.tagLine = tagLine;
     }
 
     public Map<String, String> getIngredients() {
@@ -97,18 +127,8 @@ public class Recipe {
         context.startActivity(Intent.createChooser(shareIntent, "Share via"));
     }
 
-    public String getVideoUrl() {
-        // Return the video URL for the recipe
-        return "https://www.youtube.com/results?search_query="+name; // Example URL
-    }
-
-    public String getImageUrl() {
-        // Return the image URL for the recipe
-        return "https://www.example.com/sample_image_url.jpg"; // Example URL
-    }
-
     public String getDetails() {
         // Return the details of the recipe
-        return "Pasta originated from Italy and is a staple food of Italian cuisine.";
+        return "This is a recipe for " + name + ".";
     }
 }
