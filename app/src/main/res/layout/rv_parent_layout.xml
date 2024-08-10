@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:padding="10dp"
             android:text="TIT"
-            android:textColor="@color/black"
+            android:textColor="@color/icon_color"
             android:textSize="20sp"
             android:textStyle="bold"></TextView>
 
