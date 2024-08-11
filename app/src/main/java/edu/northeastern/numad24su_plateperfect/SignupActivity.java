@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class SignupActivity extends AppCompatActivity {
 
     private EditText firstName, lastName, username;
@@ -51,8 +53,9 @@ public class SignupActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(SignupActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
                             // Navigate to next activity
-                            Intent intent = new Intent(SignupActivity.this, BottomNavBarActivity.class);
+                            Intent intent = new Intent(SignupActivity.this, AuthSelectionActivity.class);
                             intent.putExtra("currentUser", username);
+                            FirebaseUtil.setCurrentUser(username);
                             startActivity(intent);
                         } else {
                             Toast.makeText(SignupActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();

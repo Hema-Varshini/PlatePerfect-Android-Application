@@ -15,6 +15,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText username;
@@ -61,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Navigate to next activity
                     Intent intent = new Intent(LoginActivity.this, BottomNavBarActivity.class);
                     intent.putExtra("currentUser", username);
+                    FirebaseUtil.setCurrentUser(username);
                     startActivity(intent);
                 } else {
                     Toast.makeText(LoginActivity.this, "Username does not exist", Toast.LENGTH_SHORT).show();

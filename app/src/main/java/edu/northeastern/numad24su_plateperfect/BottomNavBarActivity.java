@@ -57,9 +57,8 @@ public class BottomNavBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         binding = ActivityBottomNavBarBinding.inflate(getLayoutInflater());
-        Intent intent = getIntent();
-        //currentUser = intent.getStringExtra("currentUser");
-        currentUser ="test2";
+        currentUser = FirebaseUtil.getCurrentUser();
+        //currentUser ="test2";
         FirebaseUtil.setCurrentUser(currentUser);
 
         setContentView(binding.getRoot());
@@ -135,7 +134,7 @@ public class BottomNavBarActivity extends AppCompatActivity {
                         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                         NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
                         manager.createNotificationChannel(channel);
-                        manager.notify(0, builder.build());
+                        manager.notify((int)msg.getTimestamp(), builder.build());
                     }
 
                     @Override
@@ -182,7 +181,7 @@ public class BottomNavBarActivity extends AppCompatActivity {
                                         }
                                     });
                         }
-                        Toast.makeText(BottomNavBarActivity.this, token, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(BottomNavBarActivity.this, token, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

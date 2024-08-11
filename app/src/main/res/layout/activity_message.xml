@@ -51,6 +51,7 @@
             android:layout_marginStart="10dp"
             android:fontFamily="monospace"
             android:textStyle="bold"
+            android:textColor="@color/white"
             app:layout_constraintStart_toEndOf="@id/profile_pic_image_view"
             app:layout_constraintTop_toTopOf="@id/childCL"
             app:layout_constraintBottom_toBottomOf="@id/childCL"

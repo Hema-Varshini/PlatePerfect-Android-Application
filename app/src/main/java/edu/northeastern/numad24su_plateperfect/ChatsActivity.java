@@ -34,6 +34,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class ChatsActivity extends AppCompatActivity implements IMessageDisplayListener {
 
     private RecyclerView recyclerview;
@@ -47,7 +49,7 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         super.onCreate(savedInstanceState);
         inflate();
         Intent intent = getIntent();
-        currentUser = intent.getStringExtra("currentUser");
+        currentUser = FirebaseUtil.getCurrentUser();
         //currentUser = "Shashank";
         usersList = new ArrayList<User>();
         userdatabaseReference = FirebaseDatabase.getInstance().getReference("users");

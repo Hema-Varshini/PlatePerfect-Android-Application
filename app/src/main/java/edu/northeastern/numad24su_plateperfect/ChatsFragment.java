@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class ChatsFragment extends Fragment implements IMessageDisplayListener {
 
     private RecyclerView recyclerview;
@@ -38,7 +40,7 @@ public class ChatsFragment extends Fragment implements IMessageDisplayListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        currentUser = getArguments() != null ? getArguments().getString("currentUser") : "defaultUser";
+        currentUser = FirebaseUtil.getCurrentUser();
         usersList = new ArrayList<>();
         userdatabaseReference = FirebaseDatabase.getInstance().getReference("users");
 
