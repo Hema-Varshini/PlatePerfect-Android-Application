@@ -42,6 +42,7 @@ public class ChatsFragment extends Fragment implements IMessageDisplayListener {
 
         if (savedInstanceState != null) {
             currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
         } else {
             // Retrieve currentUser from your source if not in savedInstanceState
             currentUser = FirebaseUtil.getCurrentUser();

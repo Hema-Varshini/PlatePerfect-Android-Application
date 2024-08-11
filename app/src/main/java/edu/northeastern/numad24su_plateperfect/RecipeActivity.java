@@ -58,10 +58,13 @@ public class RecipeActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe);
-
-        // For demonstration purposes, hardcoding the currentUser
-        currentUser = FirebaseUtil.getCurrentUser();
-
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         fetchUserNames();
 //        // Initialize the recipe (this should be retrieved from your database or passed via intent)
 //        Map<String, String> ingredients = new HashMap<>();
@@ -266,6 +269,11 @@ public class RecipeActivity extends AppCompatActivity {
                 .create()
                 .show();
     }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
+    }
 
     private void sendMessageToUser(String selectedUsername) {
         String chatroomId = getChatroomId(currentUser, selectedUsername);
@@ -328,6 +336,8 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void checkInitialLikeStatus() {
+        Log.d(TAG, "Checking initial like status");
+        Log.d(TAG, "Recipe name: " + recipe.getName());
         DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getName());
         likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

@@ -51,6 +51,7 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         Intent intent = getIntent();
         if (savedInstanceState != null) {
             currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
         } else {
             // Retrieve currentUser from your source if not in savedInstanceState
             currentUser = FirebaseUtil.getCurrentUser();

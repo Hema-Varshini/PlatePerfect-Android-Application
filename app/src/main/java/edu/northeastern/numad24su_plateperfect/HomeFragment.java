@@ -2,35 +2,29 @@ package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class HomeFragment extends Fragment {
 
     RecyclerView rvParentRecyclerView;
@@ -50,14 +44,6 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HomeFragment.
-     */
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -76,12 +62,10 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);;
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
         View searchBox = view.findViewById(R.id.search_box);
 
         searchBox.setOnClickListener(v -> {
-            // Intent to open the new activity
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             startActivity(intent);
         });
@@ -103,10 +87,13 @@ public class HomeFragment extends Fragment {
 
         parentAdapterClass = new aParentAdapterClass(rvParentModelClassArrayList, getContext());
         rvParentRecyclerView.setAdapter(parentAdapterClass);
+
+        // Fetch liked recipes for the current user
+        // Replace "currentUsername" with the actual username of the logged-in user
+        fetchLikedRecipes(FirebaseUtil.getCurrentUser());
     }
 
     private void fillTheRecyclerView() {
-        // Initialize individual category lists
         rvDinnerArrayList = new ArrayList<>();
         rvNewRecipeArrayList = new ArrayList<>();
         rvTrendingRecipeArrayList = new ArrayList<>();
@@ -117,7 +104,6 @@ public class HomeFragment extends Fragment {
         fetchImagesData(rvTrendingRecipeArrayList, "Trending Recipe");
         fetchImagesData(rvQuickMealsArrayList, "Quick Meals");
 
-        // Populate the parent list with categories
         rvParentModelClassArrayList.add(new rvParentModelClass("Trending Recipe", rvTrendingRecipeArrayList));
         rvParentModelClassArrayList.add(new rvParentModelClass("New Recipe", rvNewRecipeArrayList));
         rvParentModelClassArrayList.add(new rvParentModelClass("Dinner Ready", rvDinnerArrayList));
@@ -138,10 +124,8 @@ public class HomeFragment extends Fragment {
                 fillCategoryList.clear();
                 fillCategoryList.addAll(randomRecipes);
 
-                // Update the adapter
                 parentAdapterClass.notifyDataSetChanged();
 
-                // Log the fetched data
                 for (rvChildModelClass imageData : fillCategoryList) {
                     Log.d("ImagesFragment", "Category: " + categoryKey + " Name: " + imageData.getName() + ", Image Link: " + imageData.getImage_Link());
                 }
@@ -158,5 +142,69 @@ public class HomeFragment extends Fragment {
         List<rvChildModelClass> shuffledList = new ArrayList<>(sourceList);
         Collections.shuffle(shuffledList);
         return shuffledList.subList(0, Math.min(count, shuffledList.size()));
+    }
+
+    private void fetchLikedRecipes(String username) {
+        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference("likes").child(username);
+        likesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                HashSet<String> likedRecipeNames = new HashSet<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String recipeName = snapshot.getKey();
+                    if (recipeName != null) {
+                        likedRecipeNames.add(recipeName);
+                    }
+                }
+                fetchLikedRecipesDetails(likedRecipeNames);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("HomeFragment", "Error fetching liked recipes", databaseError.toException());
+            }
+        });
+    }
+
+    private void fetchLikedRecipesDetails(HashSet<String> likedRecipeNames) {
+        ArrayList<rvChildModelClass> likedRecipes = new ArrayList<>();
+        DatabaseReference recipesRef = FirebaseDatabase.getInstance().getReference("PlatePerfect");
+        recipesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    rvChildModelClass recipe = snapshot.getValue(rvChildModelClass.class);
+                    if (recipe != null && likedRecipeNames.contains(recipe.getName())) {
+                        likedRecipes.add(recipe);
+                    }
+                }
+                updateLikesCategory(likedRecipes);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("HomeFragment", "Error fetching liked recipe details", databaseError.toException());
+            }
+        });
+    }
+
+    private void updateLikesCategory(ArrayList<rvChildModelClass> likedRecipes) {
+        rvParentModelClass likesCategory = null;
+        for (rvParentModelClass category : rvParentModelClassArrayList) {
+            if (category.getFoodCategory().equals("Favourites")) {
+                likesCategory = category;
+                break;
+            }
+        }
+
+        if (likesCategory == null) {
+            likesCategory = new rvParentModelClass("Favourites", new ArrayList<>());
+            rvParentModelClassArrayList.add(0, likesCategory);
+        }
+
+        likesCategory.getRvChildModelClassList().clear();
+        likesCategory.getRvChildModelClassList().addAll(likedRecipes);
+
+        parentAdapterClass.notifyDataSetChanged();
     }
 }

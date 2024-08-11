@@ -33,6 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
+
 public class ProfileFragment extends Fragment {
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -91,8 +93,19 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        currentUserName = getArguments() != null ? getArguments().getString("currentUser") : "defaultUser";
+        if (savedInstanceState != null) {
+            currentUserName = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUserName);
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUserName = FirebaseUtil.getCurrentUser();
+        }
         return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUserName);
     }
 
     @Override

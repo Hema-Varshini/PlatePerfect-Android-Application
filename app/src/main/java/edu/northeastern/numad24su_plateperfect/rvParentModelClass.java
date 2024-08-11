@@ -10,4 +10,13 @@ public class rvParentModelClass {
         this.foodCategory = foodCategory;
         this.rvChildModelClassList = rvChildModelClassList;
     }
+
+    public String getFoodCategory() {
+        return foodCategory;
+    }
+
+    public List<rvChildModelClass> getRvChildModelClassList() {
+        return rvChildModelClassList;
+    }
+
 }

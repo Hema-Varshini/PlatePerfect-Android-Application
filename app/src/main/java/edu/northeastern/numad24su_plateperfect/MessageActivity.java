@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -58,9 +59,13 @@ public class MessageActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        currentUser = FirebaseUtil.getCurrentUser();
-        //currentUser = "shank";
-
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         //get UserModel
         otherUser = getUserModelFromIntent(intent);
        // otherUser = "Shashank";
@@ -73,6 +78,11 @@ public class MessageActivity extends AppCompatActivity {
         });
         getOrCreateChatroomModel();
         setupChatRecyclerView();
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
     }
 
     private void setupChatRecyclerView() {
