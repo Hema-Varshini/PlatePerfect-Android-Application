@@ -1,5 +1,6 @@
 package edu.northeastern.numad24su_plateperfect;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,12 +18,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InstructionsFragment extends Fragment {
 
     private static final String ARG_RECIPE_NAME = "recipe_name";
     private String recipeName;
     private DatabaseReference databaseReference;
     private LinearLayout instructionsLayout;
+    private List<Instruction> pendingInstructions = new ArrayList<>();
+
 
     public InstructionsFragment() {
         // Required empty public constructor
@@ -63,16 +69,21 @@ public class InstructionsFragment extends Fragment {
         fetchInstructions();
     }
 
+
     private void fetchInstructions() {
         databaseReference.orderByChild("recipe").equalTo(recipeName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                pendingInstructions.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String instruction = snapshot.child("instruction").getValue(String.class);
                     Long step = snapshot.child("step").getValue(Long.class);
                     if (instruction != null && step != null) {
-                        addInstructionToLayout(step, instruction);
+                        pendingInstructions.add(new Instruction(step, instruction));
                     }
+                }
+                if (isAdded()) {
+                    addPendingInstructions();
                 }
             }
 
@@ -81,6 +92,31 @@ public class InstructionsFragment extends Fragment {
                 // Handle possible errors.
             }
         });
+    }
+
+    private void addPendingInstructions() {
+        for (Instruction instruction : pendingInstructions) {
+            addInstructionToLayout(instruction.step, instruction.text);
+        }
+        pendingInstructions.clear();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (!pendingInstructions.isEmpty()) {
+            addPendingInstructions();
+        }
+    }
+
+    private static class Instruction {
+        Long step;
+        String text;
+
+        Instruction(Long step, String text) {
+            this.step = step;
+            this.text = text;
+        }
     }
 
     private void addInstructionToLayout(Long step, String instruction) {
@@ -93,4 +129,6 @@ public class InstructionsFragment extends Fragment {
 
         instructionsLayout.addView(instructionView);
     }
+
+
 }
