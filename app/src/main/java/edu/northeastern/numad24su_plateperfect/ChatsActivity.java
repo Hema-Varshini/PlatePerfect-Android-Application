@@ -49,30 +49,38 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         super.onCreate(savedInstanceState);
         inflate();
         Intent intent = getIntent();
-        currentUser = FirebaseUtil.getCurrentUser();
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         //currentUser = "Shashank";
         usersList = new ArrayList<User>();
         userdatabaseReference = FirebaseDatabase.getInstance().getReference("users");
         recyclerview = findViewById(R.id.chatsRecyclerView);
         populateRecyclerView();
-        recyclerviewAdapter = new ChatsActivityAdapter(this, usersList,this);
+        recyclerviewAdapter = new ChatsActivityAdapter(this, usersList, this);
 
         recyclerview.setAdapter(recyclerviewAdapter);
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
 
     }
 
-
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
+    }
     private void populateRecyclerView() {
         userdatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 usersList.clear();  // Clear the list before adding new data
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    Log.d("ChatsActivity", "User: " + userSnapshot.getValue());
                     User user = userSnapshot.getValue(User.class);
-                    if (user.getUsername() != null && !user.getUsername().equals(currentUser)) {
-                        usersList.add(user);
-                    }
+                    usersList.add(user);
                 }
 //                usersList.add(new User("shank"));
 //                usersList.add(new User("Test"));
@@ -105,14 +113,14 @@ public class ChatsActivity extends AppCompatActivity implements IMessageDisplayL
         User user = usersList.get(pos);
         //navigate to chat activity
         Intent intent = new Intent(this, MessageActivity.class);
-        passUserModelAsIntent(intent,user);
+        passUserModelAsIntent(intent, user);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         this.startActivity(intent);
     }
 
     private void passUserModelAsIntent(Intent intent, User user) {
-        intent.putExtra("currentUser",currentUser);
-        intent.putExtra("sender",user.getUsername());
+        intent.putExtra("currentUser", currentUser);
+        intent.putExtra("sender", user.getUsername());
 //        intent.putExtra("phone",user.getPhone());
 //        intent.putExtra("userId",model.getUserId());
 //        intent.putExtra("fcmToken",model.getFcmToken());

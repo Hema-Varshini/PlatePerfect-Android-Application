@@ -9,8 +9,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
 
@@ -38,9 +41,30 @@ public class SignupActivity extends AppCompatActivity {
             String user = username.getText().toString().trim();
 
             if (!first.isEmpty() && !last.isEmpty() && !user.isEmpty()) {
-                addUserToDatabase(user, first, last);
+                checkUsernameExists(user, first, last);
             } else {
                 Toast.makeText(SignupActivity.this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void checkUsernameExists(String username, String firstName, String lastName) {
+        databaseReference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Username already exists
+                    Toast.makeText(SignupActivity.this, "Username already exists", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Username does not exist, proceed with user registration
+                    addUserToDatabase(username, firstName, lastName);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors.
+                Toast.makeText(SignupActivity.this, "Error checking username", Toast.LENGTH_SHORT).show();
             }
         });
     }

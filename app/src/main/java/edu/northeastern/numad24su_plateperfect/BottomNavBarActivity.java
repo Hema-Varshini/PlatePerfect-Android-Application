@@ -59,13 +59,22 @@ public class BottomNavBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         binding = ActivityBottomNavBarBinding.inflate(getLayoutInflater());
-        currentUser = FirebaseUtil.getCurrentUser();
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         //currentUser ="test2";
 
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setSelectedItemId(R.id.homeMenu);
-        replaceFragment(new HomeFragment());
-
+        // Check if the activity is being created for the first time or restored after a configuration change
+        if (savedInstanceState == null) {
+            replaceFragment(new HomeFragment());
+            subscribeToUpdates();
+        }
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             Bundle bundle = new Bundle();
@@ -93,7 +102,12 @@ public class BottomNavBarActivity extends AppCompatActivity {
         //get the fcm token
         getTheFCMToken();
         startListeningForNewMessages();
-        subscribeToUpdates();
+
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
     }
     @Override
     protected void onDestroy() {
@@ -113,7 +127,7 @@ public class BottomNavBarActivity extends AppCompatActivity {
                             msg = "Subscribe failed";
                         }
 
-                        Toast.makeText(BottomNavBarActivity.this, msg, Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(BottomNavBarActivity.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

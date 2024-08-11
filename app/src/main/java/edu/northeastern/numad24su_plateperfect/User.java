@@ -4,6 +4,7 @@ public class User {
     String firstName;
     String lastName;
     String username;
+    String image;
 
     public User() {
         //default constructor
@@ -13,6 +14,14 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getUsername() {

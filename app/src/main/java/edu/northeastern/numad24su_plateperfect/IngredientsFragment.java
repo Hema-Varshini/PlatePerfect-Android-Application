@@ -51,11 +51,14 @@ public class IngredientsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_ingredients, container, false);
         ingredientsLayout = view.findViewById(R.id.ingredients_layout);
-
-        // Fetch and display ingredients
-        fetchIngredients();
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // Fetch and display ingredients after the view has been created
+        fetchIngredients();
     }
 
     private void fetchIngredients() {
@@ -81,15 +84,18 @@ public class IngredientsFragment extends Fragment {
     }
 
     private void addIngredientToLayout(String name, String qty, String unit) {
-        View ingredientView = getLayoutInflater().inflate(R.layout.item_ingredient, ingredientsLayout, false);
-        TextView ingredientName = ingredientView.findViewById(R.id.ingredient_name);
-        TextView ingredientQty = ingredientView.findViewById(R.id.ingredient_qty);
-        TextView ingredientUnit = ingredientView.findViewById(R.id.ingredient_unit);
+        // Ensure that the fragment is attached before trying to inflate views
+        if (isAdded() && getView() != null) {
+            View ingredientView = getLayoutInflater().inflate(R.layout.item_ingredient, ingredientsLayout, false);
+            TextView ingredientName = ingredientView.findViewById(R.id.ingredient_name);
+            TextView ingredientQty = ingredientView.findViewById(R.id.ingredient_qty);
+            TextView ingredientUnit = ingredientView.findViewById(R.id.ingredient_unit);
 
-        ingredientName.setText(name);
-        ingredientQty.setText(qty);
-        ingredientUnit.setText(unit);
+            ingredientName.setText(name);
+            ingredientQty.setText(qty);
+            ingredientUnit.setText(unit);
 
-        ingredientsLayout.addView(ingredientView);
+            ingredientsLayout.addView(ingredientView);
+        }
     }
 }

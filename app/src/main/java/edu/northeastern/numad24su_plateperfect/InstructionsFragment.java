@@ -53,10 +53,14 @@ public class InstructionsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_instructions, container, false);
         instructionsLayout = view.findViewById(R.id.instructions_layout);
         Log.d("InstructionsFragment", "Recipe Name: " + recipeName);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         // Fetch and display instructions
         fetchInstructions();
-
-        return view;
     }
 
     private void fetchInstructions() {

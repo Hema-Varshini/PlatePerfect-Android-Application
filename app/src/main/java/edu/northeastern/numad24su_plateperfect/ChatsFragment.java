@@ -40,7 +40,12 @@ public class ChatsFragment extends Fragment implements IMessageDisplayListener {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        currentUser = FirebaseUtil.getCurrentUser();
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         usersList = new ArrayList<>();
         userdatabaseReference = FirebaseDatabase.getInstance().getReference("users");
 
@@ -54,6 +59,12 @@ public class ChatsFragment extends Fragment implements IMessageDisplayListener {
         return view;
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
+    }
+
     private void populateRecyclerView() {
         userdatabaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -61,9 +72,7 @@ public class ChatsFragment extends Fragment implements IMessageDisplayListener {
                 usersList.clear();
                 for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                     User user = userSnapshot.getValue(User.class);
-                    if (user != null && user.getUsername() != null && !user.getUsername().equals(currentUser)) {
-                        usersList.add(user);
-                    }
+                    usersList.add(user);
                 }
                 recyclerviewAdapter.notifyDataSetChanged();
             }
