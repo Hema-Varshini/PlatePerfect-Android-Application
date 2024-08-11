@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.net.URLEncoder;
+
 public class rvChildModelClass implements Parcelable {
     private int Cook_time;
     private String Cuisine;
@@ -152,10 +154,17 @@ public class rvChildModelClass implements Parcelable {
         return "https://www.youtube.com/results?search_query="+getName(); // Example URL
     }
     public void shareRecipe(Context context) {
+        // Encode the video URL
+        String videoUrl = getVideoUrl();
+        try {
+            videoUrl = videoUrl.replace(" ","+");
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
         // Logic to handle share functionality
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, getName() + "\n" + getDescription() + "\n" + "Watch the recipe video: " + getVideoUrl());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, getName() + "\n" + getDescription() + "\n" + "Watch the recipe video: " + videoUrl);
         shareIntent.setType("text/plain");
         context.startActivity(Intent.createChooser(shareIntent, "Share via"));
     }
