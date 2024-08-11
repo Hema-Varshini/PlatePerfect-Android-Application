@@ -3,6 +3,7 @@ package edu.northeastern.numad24su_plateperfect;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -18,13 +19,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class SearchActivity extends AppCompatActivity {
 
     private EditText searchBox;
     private RecyclerView searchResultsRecyclerView;
     private SearchResultAdapter searchResultAdapter;
-    private List<Recipe> recipeList;
+    private List<rvChildModelClass> recipeList;
+    private List<rvChildModelClass> allRecipesList;
 
     private DatabaseReference databaseReference;
 
@@ -34,15 +37,22 @@ public class SearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search);
 
         searchBox = findViewById(R.id.search_box);
+        searchBox.requestFocus(); // Focus on EditText when activity starts
+
         searchResultsRecyclerView = findViewById(R.id.search_results_recycler_view);
         recipeList = new ArrayList<>();
+        allRecipesList = new ArrayList<>();
 
         // Initialize Firebase Database reference
-        databaseReference = FirebaseDatabase.getInstance("https://plateperfect-a2e82-default-rtdb.firebaseio.com/").getReference().child("PlatePerfect");
+        databaseReference = FirebaseDatabase.getInstance().getReference("PlatePerfect");
 
         searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         searchResultAdapter = new SearchResultAdapter(this, recipeList);
         searchResultsRecyclerView.setAdapter(searchResultAdapter);
+        // Load all data initially
+        loadAllRecipes();
+
 
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override
@@ -50,7 +60,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchRecipes(s.toString());
+                filterRecipesWithRegex(s.toString());
             }
 
             @Override
@@ -58,23 +68,41 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    private void searchRecipes(String query) {
-        databaseReference.orderByChild("Name").startAt(query).endAt(query + "\uf8ff")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        recipeList.clear();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            Recipe recipe = snapshot.getValue(Recipe.class);
-                            recipeList.add(recipe);
-                        }
-                        searchResultAdapter.updateList(recipeList);
+    private void loadAllRecipes() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                allRecipesList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    rvChildModelClass recipe = snapshot.getValue(rvChildModelClass.class);
+                    if (recipe != null) {
+                        allRecipesList.add(recipe);
                     }
+                }
+                filterRecipesWithRegex(searchBox.getText().toString());
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Handle potential errors.
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle potential errors.
+            }
+        });
+    }
+
+    private void filterRecipesWithRegex(String query) {
+        recipeList.clear();
+        if (!query.isEmpty()) {
+            // Use regex pattern to filter the recipes
+            Pattern pattern = Pattern.compile(Pattern.quote(query), Pattern.CASE_INSENSITIVE);
+            for (rvChildModelClass recipe : allRecipesList) {
+                String recipeName = recipe.getName();
+                if (recipeName != null && pattern.matcher(recipeName).find()) {
+                    recipeList.add(recipe);
+                }
+            }
+        } else {
+            recipeList.addAll(allRecipesList); // Show all recipes if search query is empty
+        }
+        searchResultAdapter.updateList(recipeList);
     }
 }

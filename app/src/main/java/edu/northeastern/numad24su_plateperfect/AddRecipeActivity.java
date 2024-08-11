@@ -75,7 +75,9 @@ public class AddRecipeActivity extends AppCompatActivity {
                 Toast.makeText(AddRecipeActivity.this, "Looks like you didn't added the ingredients correctly !!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Recipe recipe = new Recipe(recipeId, recipeName, description, ingredients, instructions);
+            //Recipe recipe = new Recipe(recipeId, recipeName, description, ingredients, instructions);
+            //test
+            Recipe recipe = new Recipe();
             if (recipeId != null) {
                 databaseReference.child(recipeId).setValue(recipe);
                 Toast.makeText(AddRecipeActivity.this, "Recipe added successfully!", Toast.LENGTH_SHORT).show();

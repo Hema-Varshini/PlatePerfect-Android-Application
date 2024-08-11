@@ -1,6 +1,7 @@
 package edu.northeastern.numad24su_plateperfect;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,9 @@ import java.util.List;
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> {
 
     private Context context;
-    private List<Recipe> recipeList;
+    private List<rvChildModelClass> recipeList;
 
-    public SearchResultAdapter(Context context, List<Recipe> recipeList) {
+    public SearchResultAdapter(Context context, List<rvChildModelClass> recipeList) {
         this.context = context;
         this.recipeList = recipeList;
     }
@@ -33,10 +34,17 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Recipe recipe = recipeList.get(position);
+        rvChildModelClass recipe = recipeList.get(position);
         holder.recipeName.setText(recipe.getName());
-        holder.tagline.setText(recipe.getTagLine());
-        Picasso.get().load(recipe.getImageUrl()).into(holder.recipeImage); // Use getImageUrl() here
+        holder.tagline.setText(recipe.getTagline());
+        Picasso.get().load(recipe.getImage_Link()).into(holder.recipeImage); // Use getImageUrl() here
+
+        holder.itemView.setOnClickListener(v -> {
+            // Open the recipe details activity
+            Intent intent = new Intent(context, RecipeActivity.class);
+            intent.putExtra("recipe", recipe);
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -44,7 +52,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         return recipeList.size();
     }
 
-    public void updateList(List<Recipe> newList) {
+    public void updateList(List<rvChildModelClass> newList) {
         recipeList = newList;
         notifyDataSetChanged();
     }

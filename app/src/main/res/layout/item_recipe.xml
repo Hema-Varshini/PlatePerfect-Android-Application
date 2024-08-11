@@ -23,6 +23,7 @@
             android:id="@+id/recipe_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/icon_color"
             android:text="Recipe Name"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -33,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="Tagline"
             android:textSize="14sp"
-            android:textColor="@color/gray" />
+            android:textColor="@color/icon_color" />
     </LinearLayout>
 
 </LinearLayout>
