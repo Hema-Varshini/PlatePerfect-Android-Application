@@ -339,7 +339,7 @@ public class RecipeActivity extends AppCompatActivity {
         Log.d(TAG, "Checking initial like status");
         Log.d(TAG, "Recipe name: " + recipe.getName());
         Log.d(TAG, "Current user: " + currentUser);
-        DatabaseReference likeRef = mdatabase.child("likes"+"/"+currentUser);
+        DatabaseReference likeRef = FirebaseDatabase.getInstance().getReference("likes"+"/"+currentUser);
         likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -348,10 +348,10 @@ public class RecipeActivity extends AppCompatActivity {
                      ) {
                     if(dataSnapshot.getKey().equals(recipe.getName())) {
                         isLiked = true;
-                        likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
+                        likeButton.setImageResource(R.drawable.ic_heart_filled);
+                        break;
                     }
                     else{
-                        likeRef.child(recipe.getName()).setValue(0);
                         isLiked = false;
                     }
 

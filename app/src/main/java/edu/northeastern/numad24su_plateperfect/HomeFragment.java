@@ -39,6 +39,7 @@ public class HomeFragment extends Fragment {
 
     Map<String, ArrayList<rvChildModelClass>> categoryDictionary;
     private static final int RANDOM_RECIPE_COUNT = 10;
+    private String currentUser;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -64,12 +65,23 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         View searchBox = view.findViewById(R.id.search_box);
-
+        if (savedInstanceState != null) {
+            currentUser = savedInstanceState.getString("currentUser");
+            FirebaseUtil.setCurrentUser(currentUser);
+        } else {
+            // Retrieve currentUser from your source if not in savedInstanceState
+            currentUser = FirebaseUtil.getCurrentUser();
+        }
         searchBox.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), SearchActivity.class);
             startActivity(intent);
         });
         return view;
+    }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("currentUser", currentUser);
     }
 
     @Override
@@ -90,7 +102,7 @@ public class HomeFragment extends Fragment {
 
         // Fetch liked recipes for the current user
         // Replace "currentUsername" with the actual username of the logged-in user
-        fetchLikedRecipes(FirebaseUtil.getCurrentUser());
+        fetchLikedRecipes(currentUser);
     }
 
     private void fillTheRecyclerView() {
@@ -152,7 +164,8 @@ public class HomeFragment extends Fragment {
                 HashSet<String> likedRecipeNames = new HashSet<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String recipeName = snapshot.getKey();
-                    if (recipeName != null) {
+                    boolean like = snapshot.getValue(Integer.class) == 1;
+                    if (recipeName != null && like) {
                         likedRecipeNames.add(recipeName);
                     }
                 }
