@@ -51,6 +51,8 @@ public class ProfileFragment extends Fragment {
     private String currentUserName;
     private ActivityResultLauncher<Intent> galleryLauncher;
     private ActivityResultLauncher<Intent> cameraLauncher;
+    private Button logoutButton;
+
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -103,7 +105,7 @@ public class ProfileFragment extends Fragment {
         uploadImageButton = view.findViewById(R.id.upload_image_button);
         takePhotoButton = view.findViewById(R.id.take_photo_button);
         saveButton = view.findViewById(R.id.save_button);
-
+        logoutButton = view.findViewById(R.id.logout);
 
         if (currentUserName != null) {
             loadUserData();
@@ -144,6 +146,11 @@ public class ProfileFragment extends Fragment {
         uploadImageButton.setOnClickListener(v -> openGallery());
         takePhotoButton.setOnClickListener(v -> openCamera());
         saveButton.setOnClickListener(v -> saveProfile());
+        logoutButton.setOnClickListener(v->{
+            Intent intent = new Intent(getContext(), AuthSelectionActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
     }
 
     private void openGallery() {

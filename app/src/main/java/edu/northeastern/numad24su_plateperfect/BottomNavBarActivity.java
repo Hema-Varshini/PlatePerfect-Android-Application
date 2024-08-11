@@ -51,6 +51,8 @@ public class BottomNavBarActivity extends AppCompatActivity {
                 }
             });
     private String currentUser;
+    private DatabaseReference latest;
+    private ChildEventListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,6 @@ public class BottomNavBarActivity extends AppCompatActivity {
         binding = ActivityBottomNavBarBinding.inflate(getLayoutInflater());
         currentUser = FirebaseUtil.getCurrentUser();
         //currentUser ="test2";
-        FirebaseUtil.setCurrentUser(currentUser);
 
         setContentView(binding.getRoot());
         binding.bottomNavigationView.setSelectedItemId(R.id.homeMenu);
@@ -94,6 +95,13 @@ public class BottomNavBarActivity extends AppCompatActivity {
         startListeningForNewMessages();
         subscribeToUpdates();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (latest != null && listener != null) {
+            latest.removeEventListener(listener);
+        }
+    }
 
     private void subscribeToUpdates() {
         FirebaseMessaging.getInstance().subscribeToTopic("newRecipes")
@@ -111,44 +119,53 @@ public class BottomNavBarActivity extends AppCompatActivity {
     }
 
     private void startListeningForNewMessages() {
-        FirebaseDatabase.getInstance().getReference("latest").child(currentUser)
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                        // new child added is new message received
 
-                    }
+        latest = FirebaseDatabase.getInstance().getReference("latest").child(currentUser);
+        listener =  getListener();
+        latest.addChildEventListener(listener);
 
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                        ChatMessage  msg = snapshot.getValue(ChatMessage.class);
-                        Intent intent = new Intent(BottomNavBarActivity.this, MessageActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.putExtra("sender", msg.getSender());
-                        PendingIntent pendingIntent = PendingIntent.getActivity(BottomNavBarActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-                        String channelId = "Default";
-                        NotificationCompat.Builder builder = new  NotificationCompat.Builder(BottomNavBarActivity.this, channelId)
-                                .setSmallIcon(R.mipmap.ic_launcher)
-                                .setContentTitle("New Message From "+ snapshot.getKey())
-                                .setContentText("Hey! Check this new Recipe called " + msg.getMessage()).setAutoCancel(true).setContentIntent(pendingIntent);;
-                        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                        NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
-                        manager.createNotificationChannel(channel);
-                        manager.notify((int)msg.getTimestamp(), builder.build());
-                    }
+    }
 
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    }
+    @NonNull
+    private ChildEventListener getListener() {
+        return new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                // new child added is new message received
 
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                ChatMessage msg = snapshot.getValue(ChatMessage.class);
+                Intent intent = new Intent(BottomNavBarActivity.this, MessageActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("sender", msg.getSender());
+                PendingIntent pendingIntent = PendingIntent.getActivity(BottomNavBarActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+                String channelId = "Default";
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(BottomNavBarActivity.this, channelId)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("New Message From " + snapshot.getKey())
+                        .setContentText("Hey! Check this new Recipe called " + msg.getMessage()).setAutoCancel(true).setContentIntent(pendingIntent);
+                ;
+                NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                NotificationChannel channel = new NotificationChannel(channelId, "Default channel", NotificationManager.IMPORTANCE_DEFAULT);
+                manager.createNotificationChannel(channel);
+                manager.notify((int) msg.getTimestamp(), builder.build());
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
     }
 
     private void getTheFCMToken() {

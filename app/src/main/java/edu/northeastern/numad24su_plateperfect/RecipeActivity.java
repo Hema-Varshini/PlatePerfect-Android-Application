@@ -299,6 +299,8 @@ public class RecipeActivity extends AppCompatActivity {
 
                 // Set the message data
                 latestRef.setValue(message);
+                Toast.makeText(RecipeActivity.this, "Message Sent Successfully",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -307,6 +309,7 @@ public class RecipeActivity extends AppCompatActivity {
                 Log.e("Message", "Error checking if record exists: " + databaseError.getMessage());
             }
         });
+
 
 
     }
