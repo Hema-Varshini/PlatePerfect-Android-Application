@@ -1,7 +1,9 @@
 package edu.northeastern.numad24su_plateperfect;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -37,23 +40,22 @@ import edu.northeastern.numad24su_plateperfect.firebase.FirebaseUtil;
 
 public class ProfileFragment extends Fragment {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
-    private static final int REQUEST_IMAGE_PICK = 2;
+    private static final int CAMERA_PERMISSION_CODE = 100;
 
     private ImageView profileImageView;
     private EditText firstNameEditText;
     private EditText lastNameEditText;
-    private EditText usernameEditText;
     private Button uploadImageButton;
     private Button takePhotoButton;
     private Button saveButton;
+    private Button logoutButton;
 
     private DatabaseReference mDatabase;
     private StorageReference mStorage;
     private String currentUserName;
     private ActivityResultLauncher<Intent> galleryLauncher;
     private ActivityResultLauncher<Intent> cameraLauncher;
-    private Button logoutButton;
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -88,6 +90,14 @@ public class ProfileFragment extends Fragment {
                         }
                     }
                 });
+
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                openCamera();
+            } else {
+                Toast.makeText(getContext(), "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -97,11 +107,11 @@ public class ProfileFragment extends Fragment {
             currentUserName = savedInstanceState.getString("currentUser");
             FirebaseUtil.setCurrentUser(currentUserName);
         } else {
-            // Retrieve currentUser from your source if not in savedInstanceState
             currentUserName = FirebaseUtil.getCurrentUser();
         }
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -134,7 +144,6 @@ public class ProfileFragment extends Fragment {
                 if (dataSnapshot.exists()) {
                     String firstName = dataSnapshot.child("firstName").getValue(String.class);
                     String lastName = dataSnapshot.child("lastName").getValue(String.class);
-                    String username = dataSnapshot.child("username").getValue(String.class);
                     String imageUrl = dataSnapshot.child("image").getValue(String.class);
 
                     firstNameEditText.setText(firstName);
@@ -157,13 +166,22 @@ public class ProfileFragment extends Fragment {
 
     private void setupListeners() {
         uploadImageButton.setOnClickListener(v -> openGallery());
-        takePhotoButton.setOnClickListener(v -> openCamera());
+        takePhotoButton.setOnClickListener(v -> checkCameraPermission());
         saveButton.setOnClickListener(v -> saveProfile());
-        logoutButton.setOnClickListener(v->{
+        logoutButton.setOnClickListener(v -> {
             Intent intent = new Intent(getContext(), AuthSelectionActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         });
+    }
+
+    private void checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
+        } else {
+            openCamera();
+        }
     }
 
     private void openGallery() {
@@ -181,9 +199,8 @@ public class ProfileFragment extends Fragment {
     private void saveProfile() {
         String firstName = firstNameEditText.getText().toString().trim();
         String lastName = lastNameEditText.getText().toString().trim();
-        //String username = usernameEditText.getText().toString().trim();
 
-        if (firstName.isEmpty() || lastName.isEmpty() ) {
+        if (firstName.isEmpty() || lastName.isEmpty()) {
             Toast.makeText(getContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -191,7 +208,6 @@ public class ProfileFragment extends Fragment {
         Map<String, Object> userUpdates = new HashMap<>();
         userUpdates.put("firstName", firstName);
         userUpdates.put("lastName", lastName);
-       // userUpdates.put("username", username);
 
         mDatabase.child(currentUserName).updateChildren(userUpdates)
                 .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show())
