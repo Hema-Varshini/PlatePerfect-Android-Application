@@ -338,17 +338,23 @@ public class RecipeActivity extends AppCompatActivity {
     private void checkInitialLikeStatus() {
         Log.d(TAG, "Checking initial like status");
         Log.d(TAG, "Recipe name: " + recipe.getName());
-        DatabaseReference likeRef = mdatabase.child("likes").child(currentUser).child(recipe.getName());
+        Log.d(TAG, "Current user: " + currentUser);
+        DatabaseReference likeRef = mdatabase.child("likes"+"/"+currentUser);
         likeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    isLiked = snapshot.getValue(Integer.class) == 1;
-                    likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
-                } else {
-                    // Initialize the like status in Firebase if it doesn't exist
-                    likeRef.setValue(0);
-                    isLiked = false;
+                Log.d(TAG, "Snapshot: " + snapshot);
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()
+                     ) {
+                    if(dataSnapshot.getKey().equals(recipe.getName())) {
+                        isLiked = true;
+                        likeButton.setImageResource(isLiked ? R.drawable.ic_heart_filled : R.drawable.ic_heart_unfilled);
+                    }
+                    else{
+                        likeRef.child(recipe.getName()).setValue(0);
+                        isLiked = false;
+                    }
+
                 }
             }
 
