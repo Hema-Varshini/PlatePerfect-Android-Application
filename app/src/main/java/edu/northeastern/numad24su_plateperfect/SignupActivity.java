@@ -53,7 +53,7 @@ public class SignupActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(SignupActivity.this, "User registered successfully", Toast.LENGTH_SHORT).show();
                             // Navigate to next activity
-                            Intent intent = new Intent(SignupActivity.this, AuthSelectionActivity.class);
+                            Intent intent = new Intent(SignupActivity.this, BottomNavBarActivity.class);
                             intent.putExtra("currentUser", username);
                             FirebaseUtil.setCurrentUser(username);
                             startActivity(intent);
