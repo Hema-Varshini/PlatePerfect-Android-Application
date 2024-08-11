@@ -51,6 +51,8 @@ public class RecipeActivity extends AppCompatActivity {
     private String fetchedRecipeName;
     private String fetchedDescription;
     private GestureDetector gestureDetector;
+    private long lastTapTime = 0;
+    private static final long DOUBLE_TAP_TIME_DELTA = 300; //milliseconds
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,7 +75,7 @@ public class RecipeActivity extends AppCompatActivity {
         recipeImage = findViewById(R.id.recipe_image);
         likeButton = findViewById(R.id.like_button);
         ImageButton shareButton = findViewById(R.id.share_button);
-        ImageButton playButton = findViewById(R.id.play_button);
+
         recipeName = findViewById(R.id.recipe_name);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         ViewPager viewPager = findViewById(R.id.view_pager);
@@ -83,30 +85,36 @@ public class RecipeActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> {
             sendThisRecipe();
         });
-        // Initialize GestureDetector
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                // Toggle like status on double tap
-                likeTheRecipe();
-                return true;
-            }
 
+
+        recipeImage.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                // Call performClick when a single tap is detected
-                // This will trigger the onClickListener
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    long currentTime = System.currentTimeMillis();
+                    long tapTimeInterval = currentTime - lastTapTime;
+
+                    if (tapTimeInterval < DOUBLE_TAP_TIME_DELTA) {
+                        Log.d(TAG, "Double tap detected");
+                        likeTheRecipe();
+                    } else {
+                        Log.d(TAG, "Single tap detected");
+
+                    }
+
+                    lastTapTime = currentTime;
+                }
                 return true;
             }
         });
 
-        // Set OnTouchListener on the root layout
-        View rootView = findViewById(android.R.id.content);
-        // On Double Tap
-        rootView.setOnTouchListener(new View.OnTouchListener() {
+        //youtube_button
+        ImageButton youtube_button = findViewById(R.id.youtube_button);
+        youtube_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return gestureDetector.onTouchEvent(event);
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
+                startActivity(intent);
             }
         });
 
@@ -123,15 +131,8 @@ public class RecipeActivity extends AppCompatActivity {
             }
         });
 
-        playButton.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
-            startActivity(intent);
-        });
-        recipeImage.setOnClickListener(v -> {
-            Log.d(TAG, "Opening video URL: " + recipe.getVideoUrl());
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(recipe.getVideoUrl()));
-            startActivity(intent);
-        });
+    
+
         // Set up TabLayout and ViewPager
         tabLayout.addTab(tabLayout.newTab().setText("Details"));
         tabLayout.addTab(tabLayout.newTab().setText("Ingredients"));
@@ -142,28 +143,29 @@ public class RecipeActivity extends AppCompatActivity {
 
         // Fetch data from Firebase
         recipe = getIntent().getParcelableExtra("recipe");
-        if(recipe == null){
+        if (recipe == null) {
             fetchThisRecipe();
-        }else{
+        } else {
             fetchRecipeData();
             checkInitialLikeStatus();
         }
 
     }
 
+
     private void fetchThisRecipe() {
         Log.d(TAG, "Fetching recipe: " + getIntent().getStringExtra("recipeName"));
         mdatabase.orderByChild("Name").equalTo(getIntent().getStringExtra("recipeName")).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getChildrenCount() == 0){
+                if (dataSnapshot.getChildrenCount() == 0) {
                     Toast.makeText(RecipeActivity.this, "Recipe not found", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        recipe = snapshot.getValue(rvChildModelClass.class);
-                        fetchRecipeData();
-                        checkInitialLikeStatus();
+                    recipe = snapshot.getValue(rvChildModelClass.class);
+                    fetchRecipeData();
+                    checkInitialLikeStatus();
                 }
             }
 
